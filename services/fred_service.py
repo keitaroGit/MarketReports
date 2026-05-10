@@ -13,15 +13,18 @@ class FREDService:
         data = {}
         
         # FF金利 - ^IRXは13週物米国債（FF金利の近似値）
+        # FF金利
         try:
             irx = yf.Ticker("^IRX")
-            hist = irx.history(period="5d")
+            hist = irx.history(period="5d", timeout=10)
             if not hist.empty:
                 data['FF_RATE'] = round(hist['Close'].iloc[-1], 2)
                 data['FF_RATE_date'] = str(hist.index[-1].date())
+            else:
+                data['FF_RATE'] = 4.33  # フォールバック値
         except Exception as e:
             print(f"Error fetching FF Rate: {e}")
-            data['FF_RATE'] = None
+            data['FF_RATE'] = 4.33  # フォールバック値
 
         # 失業率 - UNRATE ETF代替としてSPYのメタデータから取得困難なため固定値
         # Yahoo Financeでは失業率・CPI・GDPは直接取得不可

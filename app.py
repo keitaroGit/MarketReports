@@ -218,14 +218,14 @@ def refresh_data():
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Health check endpoint"""
+    import os
+    claude_key = os.getenv('CLAUDE_API_KEY', 'NOT_FOUND')
     return jsonify({
         'status': 'healthy',
+        'claude_key_exists': bool(claude_key and claude_key != 'NOT_FOUND'),
+        'claude_key_prefix': claude_key[:10] if claude_key != 'NOT_FOUND' else 'NOT_FOUND',
         'has_macro': dashboard_data['macro_overview'] is not None,
-        'has_geo': dashboard_data['geopolitical_radar'] is not None,
-        'has_sectors': dashboard_data['sector_scorecard'] is not None
     })
-
 # ============================================================================
 # Initialization and Error Handling
 # ============================================================================

@@ -215,7 +215,12 @@ body {
     color: var(--text-secondary);
     font-size: 0.85rem;
 }
-
+.macro-sub {
+    color: var(--primary-pink);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.3rem;
+}
 .commentary-section {
     background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(255, 179, 217, 0.04) 100%);
     border: 1px solid var(--primary-pink);
