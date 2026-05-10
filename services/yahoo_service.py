@@ -28,7 +28,7 @@ class YahooFinanceService:
         for ticker, info in self.SECTOR_ETFS.items():
             try:
                 etf = yf.Ticker(ticker)
-                hist = etf.history(start=year_start - timedelta(days=35), end=today)
+                hist = etf.history(start=year_start - timedelta(days=35), end=today, timeout=10)
 
                 if hist.empty:
                     continue
