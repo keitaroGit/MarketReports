@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Reports Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="logo">📊 Market Reports</h1>
+                <div class="header-controls">
+                    <button id="languageToggle" class="lang-toggle">日本語</button>
+                    <button id="refreshButton" class="refresh-button">🔄 Refresh</button>
+                    <div class="status-indicator">
+                        <span id="lastUpdate" class="last-update"></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Section 1: Macro Overview -->
+            <section class="dashboard-section macro-section">
+                <div class="section-header">
+                    <h2 class="section-title" data-en="Macro Overview" data-ja="マクロ概況">Macro Overview</h2>
+                    <span class="section-icon">📈</span>
+                </div>
+                <div class="section-content">
+                    <div id="macroLoader" class="loader">Loading...</div>
+                    <div id="macroContent" class="macro-grid hidden">
+                        <div class="macro-card">
+                            <div class="macro-label" data-en="Fed Funds Rate" data-ja="FF金利">Fed Funds Rate</div>
+                            <div class="macro-value" id="ffRate">-</div>
+                            <div class="macro-unit">%</div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-label" data-en="CPI" data-ja="CPI">CPI</div>
+                            <div class="macro-value" id="cpi">-</div>
+                            <div class="macro-unit">YoY %</div>
+                            <div class="macro-sub" id="cpiMom"></div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-label" data-en="GDP Growth" data-ja="GDP成長">GDP Growth</div>
+                            <div class="macro-value" id="gdp">-</div>
+                            <div class="macro-unit">%</div>
+                        </div>
+                        <div class="macro-card">
+                            <div class="macro-label" data-en="Unemployment Rate" data-ja="失業率">Unemployment Rate</div>
+                            <div class="macro-value" id="unemployment">-</div>
+                            <div class="macro-unit">%</div>
+                        </div>
+                    </div>
+                    
+                    <div id="macroCommentary" class="commentary-section hidden">
+                        <div class="commentary-title" data-en="Weekly Commentary" data-ja="週次コメント">Weekly Commentary</div>
+                        <div id="macroCommentaryText" class="commentary-text"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Geopolitical Radar -->
+            <section class="dashboard-section geopolitical-section">
+                <div class="section-header">
+                    <h2 class="section-title" data-en="Geopolitical Radar" data-ja="地政学リスク">Geopolitical Radar</h2>
+                    <span class="section-icon">⚠️</span>
+                </div>
+                <div class="section-content">
+                    <div id="geoLoader" class="loader">Loading...</div>
+                    <div id="geoContent" class="geo-content hidden">
+                        <div id="geoSummary" class="geo-summary">
+                            <div class="summary-title" data-en="Risk Assessment" data-ja="リスク評価">Risk Assessment</div>
+                            <div id="geoSummaryText" class="summary-text"></div>
+                        </div>
+                        
+                        <div id="geoNews" class="geo-news">
+                            <div class="news-title" data-en="Latest News" data-ja="最新ニュース">Latest News</div>
+                            <div id="newsList" class="news-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Sector Scorecard -->
+            <section class="dashboard-section sector-section">
+                <div class="section-header">
+                    <h2 class="section-title" data-en="Sector Scorecard" data-ja="セクタースコアカード">Sector Scorecard</h2>
+                    <span class="section-icon">🏆</span>
+                </div>
+                <div class="section-content">
+                    <div id="sectorLoader" class="loader">Loading...</div>
+                    <div id="sectorContent" class="sector-content hidden">
+                        <div class="sector-tabs">
+                            <button class="sector-tab active" data-period="ytd" data-en="YTD" data-ja="年初来">YTD</button>
+                            <button class="sector-tab" data-period="monthly" data-en="1M" data-ja="1ヶ月">1M</button>
+                            <button class="sector-tab" data-period="weekly" data-en="1W" data-ja="1週間">1W</button>
+                        </div>
+                        <div id="sectorTable" class="sector-table"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p data-en="Real-time institutional investment dashboard" data-ja="リアルタイム機関投資家向けダッシュボード">Real-time institutional investment dashboard</p>
+            <p class="disclaimer" data-en="Data for informational purposes only. Not investment advice." data-ja="情報提供目的のみ。投資助言ではありません。">Data for informational purposes only. Not investment advice.</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/translation.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+/* ============================================================================
+   Market Reports Dashboard - Pink Theme CSS
+   ============================================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Pink color palette - inspired by Earnings Analyzer */
+    --primary-pink: #FF6B9D;
+    --light-pink: #FFB3D9;
+    --soft-pink: #FFE5F0;
+    --dark-pink: #E84C6F;
+    
+    /* Supporting colors */
+    --dark-bg: #0F1419;
+    --card-bg: #1A1F2E;
+    --border-color: #2D3748;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B8C1;
+    --accent-green: #4ADE80;
+    --accent-red: #FF6B6B;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(255, 107, 157, 0.2);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* ============================================================================
+   Header
+   ============================================================================ */
+
+.dashboard-header {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 179, 217, 0.05) 100%);
+    border-bottom: 1px solid var(--primary-pink);
+    padding: 1.5rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.1);
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-pink);
+    letter-spacing: -0.5px;
+}
+
+.header-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.lang-toggle,
+.refresh-button {
+    background: linear-gradient(135deg, var(--primary-pink) 0%, var(--dark-pink) 100%);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.lang-toggle:hover,
+.refresh-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.3);
+}
+
+.lang-toggle:active,
+.refresh-button:active {
+    transform: translateY(0);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.last-update {
+    color: var(--text-secondary);
+}
+
+/* ============================================================================
+   Main Layout
+   ============================================================================ */
+
+.dashboard-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-main {
+    flex: 1;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ============================================================================
+   Sections
+   ============================================================================ */
+
+.dashboard-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+}
+
+.dashboard-section:hover {
+    border-color: var(--primary-pink);
+    box-shadow: 0 8px 32px rgba(255, 107, 157, 0.25);
+}
+
+.section-header {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.15) 0%, rgba(255, 179, 217, 0.08) 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--primary-pink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-pink);
+    margin: 0;
+}
+
+.section-icon {
+    font-size: 1.8rem;
+}
+
+.section-content {
+    padding: 2rem;
+}
+
+/* ============================================================================
+   Macro Overview
+   ============================================================================ */
+
+.macro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.macro-card {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 179, 217, 0.05) 100%);
+    border: 1px solid var(--primary-pink);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.macro-card:hover {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.15) 0%, rgba(255, 179, 217, 0.1) 100%);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255, 107, 157, 0.2);
+}
+
+.macro-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.macro-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-pink);
+    margin: 0.5rem 0;
+}
+
+.macro-unit {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.commentary-section {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(255, 179, 217, 0.04) 100%);
+    border: 1px solid var(--primary-pink);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.commentary-title {
+    color: var(--primary-pink);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.commentary-text {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* ============================================================================
+   Geopolitical Radar
+   ============================================================================ */
+
+.geo-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 900px) {
+    .geo-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.geo-summary {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 179, 217, 0.05) 100%);
+    border: 1px solid var(--primary-pink);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.summary-title {
+    color: var(--primary-pink);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.summary-text {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.geo-news {
+    border-radius: 10px;
+}
+
+.news-title {
+    color: var(--primary-pink);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.news-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.news-item {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(255, 179, 217, 0.04) 100%);
+    border: 1px solid var(--primary-pink);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.news-item:hover {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.12) 0%, rgba(255, 179, 217, 0.08) 100%);
+    transform: translateX(4px);
+}
+
+.news-headline {
+    color: var(--primary-pink);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.news-description {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.news-meta {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ============================================================================
+   Sector Scorecard
+   ============================================================================ */
+
+.sector-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.sector-tab {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 2px solid transparent;
+    padding: 0.7rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.sector-tab:hover {
+    color: var(--primary-pink);
+    background: rgba(255, 107, 157, 0.1);
+}
+
+.sector-tab.active {
+    color: var(--primary-pink);
+    border-bottom: 2px solid var(--primary-pink);
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 179, 217, 0.05) 100%);
+}
+
+.sector-table {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.sector-row {
+    display: grid;
+    grid-template-columns: 1fr 150px 120px 120px;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(255, 179, 217, 0.04) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.sector-row:hover {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.12) 0%, rgba(255, 179, 217, 0.08) 100%);
+    border-color: var(--primary-pink);
+}
+
+.sector-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary-pink) 0%, var(--dark-pink) 100%);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+}
+
+.sector-name {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sector-ticker {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.sector-full-name {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.sector-price {
+    text-align: right;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.sector-return {
+    text-align: right;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.return-positive {
+    color: var(--accent-green);
+}
+
+.return-negative {
+    color: var(--accent-red);
+}
+
+/* ============================================================================
+   Utilities
+   ============================================================================ */
+
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+.hidden {
+    display: none;
+}
+
+.error-message {
+    background: rgba(255, 107, 157, 0.1);
+    border: 1px solid var(--primary-pink);
+    color: var(--primary-pink);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+/* ============================================================================
+   Footer
+   ============================================================================ */
+
+.dashboard-footer {
+    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 179, 217, 0.05) 100%);
+    border-top: 1px solid var(--primary-pink);
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+
+.dashboard-footer p {
+    margin: 0.5rem 0;
+}
+
+.disclaimer {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* ============================================================================
+   Responsive Design
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .dashboard-main {
+        padding: 1rem;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .macro-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sector-row {
+        grid-template-columns: 1fr 100px;
+        gap: 1rem;
+    }
+
+    .section-content {
+        padding: 1.5rem;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .macro-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sector-row {
+        grid-template-columns: 1fr;
+    }
+
+    .header-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .lang-toggle,
+    .refresh-button {
+        width: 100%;
+    }
+}
