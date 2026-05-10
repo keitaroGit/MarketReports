@@ -5,7 +5,7 @@ Investor-focused dashboard for macro, geopolitical, and sector analysis
 from flask import Flask, render_template, jsonify, request
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=False)  # 既存の環境変数を上書きしない
 from config import config
 from services.fred_service import FREDService
 from services.newsapi_service import NewsAPIService
