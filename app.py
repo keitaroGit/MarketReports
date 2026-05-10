@@ -245,8 +245,16 @@ def initialize_dashboard():
     update_geopolitical_radar()
     update_sector_scorecard()
     print("Dashboard initialized")
+# Initialize for gunicorn
+initialize_dashboard()
+scheduler.start()
+update_interval = app.config.get('UPDATE_INTERVAL', 30)
+scheduler.add_job(update_macro_overview, interval_minutes=update_interval, job_id='macro_update')
+scheduler.add_job(update_geopolitical_radar, interval_minutes=update_interval, job_id='geo_update')
+scheduler.add_job(update_sector_scorecard, interval_minutes=update_interval, job_id='sector_update')
 
 if __name__ == '__main__':
+
     # Initialize data
     initialize_dashboard()
     
