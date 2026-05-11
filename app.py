@@ -3,6 +3,7 @@ Market Reports Dashboard - Flask Application
 Investor-focused dashboard for macro, geopolitical, and sector analysis
 """
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 load_dotenv(override=False)  # 既存の環境変数を上書きしない
@@ -16,6 +17,7 @@ from utils.scheduler import UpdateScheduler
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 env = os.getenv('FLASK_ENV', 'development')
 app.config.from_object(config[env])
 
