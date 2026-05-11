@@ -35,12 +35,8 @@ class YahooFinanceService:
 
                 current_price = hist['Close'].iloc[-1]
                 ytd_start_price = hist['Close'].iloc[0]
-
-                # 1週間前
                 week_ago_idx = max(0, len(hist) - 6)
                 week_ago_price = hist['Close'].iloc[week_ago_idx]
-
-                # 1ヶ月前
                 month_ago_idx = max(0, len(hist) - 22)
                 month_ago_price = hist['Close'].iloc[month_ago_idx]
 
@@ -65,15 +61,13 @@ class YahooFinanceService:
                 print(f"Error fetching {ticker}: {e}")
 
         results.sort(key=lambda x: x['ytd'], reverse=True)
-        
-        # フォールバック：データが取れなかった場合
+
         if not results:
             return self._get_fallback_data()
-        
+
         return results
 
     def _get_fallback_data(self):
-        """フォールバック用の固定データ"""
         return [
             {'ticker': 'XLK', 'name': 'Technology', 'ja_name': 'テクノロジー', 'current_price': 175.52, 'ytd_start_price': 142.72, 'week_ago_price': 161.87, 'month_ago_price': 142.07, 'ytd': 22.99, 'weekly': 8.43, 'monthly': 23.54},
             {'ticker': 'XLE', 'name': 'Energy', 'ja_name': 'エネルギー', 'current_price': 55.70, 'ytd_start_price': 44.55, 'week_ago_price': 58.85, 'month_ago_price': 57.33, 'ytd': 25.02, 'weekly': -5.35, 'monthly': -2.84},
@@ -87,4 +81,3 @@ class YahooFinanceService:
             {'ticker': 'XLF', 'name': 'Financials', 'ja_name': '金融', 'current_price': 51.24, 'ytd_start_price': 52.87, 'week_ago_price': 51.92, 'month_ago_price': 51.33, 'ytd': -3.09, 'weekly': -1.31, 'monthly': -0.18},
             {'ticker': 'XLV', 'name': 'Healthcare', 'ja_name': 'ヘルスケア', 'current_price': 143.49, 'ytd_start_price': 156.34, 'week_ago_price': 145.16, 'month_ago_price': 149.33, 'ytd': -8.22, 'weekly': -1.15, 'monthly': -3.91},
         ]
-        return results
