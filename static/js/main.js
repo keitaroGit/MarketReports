@@ -195,7 +195,7 @@ class DashboardManager {
                 </div>
             `).join('');
         }
-
+    }
 
     renderSectorScorecard() {
         const content = document.getElementById('sectorContent');
