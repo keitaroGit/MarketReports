@@ -259,10 +259,7 @@ body {
 }
 
 .geo-summary {
-    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 179, 217, 0.05) 100%);
-    border: 1px solid var(--primary-pink);
-    border-radius: 10px;
-    padding: 1.5rem;
+    width: 100%;
 }
 
 .summary-title {
