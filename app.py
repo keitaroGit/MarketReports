@@ -237,7 +237,18 @@ def health_check():
 # ============================================================================
 # Initialization and Error Handling
 # ============================================================================
-
+@app.route('/api/news', methods=['GET'])
+def get_news():
+    """Get latest news for external use (Wix etc.)"""
+    try:
+        limit = int(request.args.get('limit', 10))
+        news_items = newsapi_service.get_geopolitical_news(limit=limit)
+        return jsonify({
+            'status': 'success',
+            'news': news_items
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
