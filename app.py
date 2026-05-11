@@ -111,7 +111,13 @@ def update_sector_scorecard():
             return
         
         # Fetch sector data
-        sector_data = yahoo_service.get_sector_performance()
+        try:
+            sector_data = yahoo_service.get_sector_performance()
+            if not sector_data:
+                sector_data = yahoo_service._get_fallback_data()
+        except Exception as e:
+            print(f"Yahoo Finance error: {e}")
+            sector_data = yahoo_service._get_fallback_data()
         
         sector_scorecard = {
             'sectors': sector_data
