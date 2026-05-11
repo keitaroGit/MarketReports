@@ -57,7 +57,7 @@ Use plain text only, no Markdown formatting. Be concise and professional."""
         ])
         
         if language == 'ja':
-            prompt = f"""あなたは地政学リスク分析の専門家です。以下の最新地政学ニュースを分析し、投資家向けのリスク要約を日本語で生成してください。
+            prompt = f"""あなたは地政学リスク分析の専門家です。以下の最新地政学ニュースを分析し、投資家向けのリスク要約を日本語で生成してください。タイトルや見出しは一切付けないでください。
 
 【最新ニュース】
 {news_text if news_text.strip() else "現在ニュースデータがありません。一般的な地政学リスクを分析してください。"}
@@ -69,7 +69,7 @@ Use plain text only, no Markdown formatting. Be concise and professional."""
 
 Markdownの**太字**や##見出しは使わず、プレーンテキストで簡潔にお答えください。"""
         else:
-            prompt = f"""You are a geopolitical risk analyst. Analyze the following latest geopolitical news and generate a risk summary for investors.
+            prompt = f"""You are a geopolitical risk analyst. Analyze the following latest geopolitical news and generate a risk summary for investors. Do not include any title or heading at the beginning.
 
 Latest News:
 {news_text if news_text.strip() else "No news data available. Please analyze general geopolitical risks."}
