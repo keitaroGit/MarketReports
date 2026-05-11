@@ -7,19 +7,23 @@ from datetime import datetime
 
 class NewsAPIService:
     RSS_FEEDS = [
-        {
-            'url': 'https://feeds.reuters.com/reuters/businessNews',
-            'source': 'Reuters'
-        },
-        {
-            'url': 'https://feeds.bbci.co.uk/news/business/rss.xml',
-            'source': 'BBC Business'
-        },
-        {
-            'url': 'https://feeds.bbci.co.uk/news/world/rss.xml',
-            'source': 'BBC World'
-        },
-    ]
+    {
+        'url': 'https://feeds.bbci.co.uk/news/business/rss.xml',
+        'source': 'BBC Business'
+    },
+    {
+        'url': 'https://feeds.bbci.co.uk/news/world/rss.xml',
+        'source': 'BBC World'
+    },
+    {
+        'url': 'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',
+        'source': 'NY Times'
+    },
+    {
+        'url': 'https://feeds.marketwatch.com/marketwatch/topstories/',
+        'source': 'MarketWatch'
+    },
+]
 
     def get_geopolitical_news(self, limit=10):
         articles = []
