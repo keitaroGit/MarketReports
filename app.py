@@ -231,6 +231,8 @@ def health_check():
         'claude_key_exists': bool(claude_key and claude_key != 'NOT_FOUND'),
         'claude_key_prefix': claude_key[:10] if claude_key != 'NOT_FOUND' else 'NOT_FOUND',
         'has_macro': dashboard_data['macro_overview'] is not None,
+        'has_geo': dashboard_data['geopolitical_radar'] is not None,
+        'has_sectors': dashboard_data['sector_scorecard'] is not None,
     })
 # ============================================================================
 # Initialization and Error Handling
