@@ -183,7 +183,7 @@ class DashboardManager {
         }
 
         // Render news items
-        if (data.news && data.news.length > 0) {
+        if (newsList && data.news && data.news.length > 0) {
             newsList.innerHTML = data.news.map((item, index) => `
                 <div class="news-item" onclick="window.open('${item.url}', '_blank')">
                     <div class="news-headline">${item.title}</div>
@@ -195,7 +195,7 @@ class DashboardManager {
                 </div>
             `).join('');
         }
-    }
+
 
     renderSectorScorecard() {
         const content = document.getElementById('sectorContent');
