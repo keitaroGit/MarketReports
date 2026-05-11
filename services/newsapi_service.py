@@ -23,6 +23,14 @@ class NewsAPIService:
         'url': 'https://feeds.marketwatch.com/marketwatch/topstories/',
         'source': 'MarketWatch'
     },
+    {
+        'url': 'https://www.cnbc.com/id/100003114/device/rss/rss.html',
+        'source': 'CNBC'
+    },
+    {
+        'url': 'https://www.investing.com/rss/news.rss',
+        'source': 'Investing.com'
+    },
 ]
 
     def get_geopolitical_news(self, limit=10):
