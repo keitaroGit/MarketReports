@@ -5,6 +5,7 @@ Investor-focused dashboard for macro, geopolitical, and sector analysis
 from flask import Flask, render_template, jsonify, request, Response
 from flask_cors import CORS
 import os 
+import json
 from dotenv import load_dotenv
 load_dotenv(override=False)  # 既存の環境変数を上書きしない
 from config import config
