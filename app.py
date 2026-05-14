@@ -4,7 +4,7 @@ Investor-focused dashboard for macro, geopolitical, and sector analysis
 """
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
-import os
+import os 
 from dotenv import load_dotenv
 load_dotenv(override=False)  # 既存の環境変数を上書きしない
 from config import config
@@ -12,6 +12,7 @@ from services.fred_service import FREDService
 from services.newsapi_service import NewsAPIService
 from services.yahoo_service import YahooFinanceService
 from services.claude_service import ClaudeService
+from services.report_service import ReportService
 from utils.cache import CacheManager
 from utils.scheduler import UpdateScheduler
 
@@ -25,6 +26,7 @@ app.config.from_object(config[env])
 fred_service = FREDService()
 newsapi_service = NewsAPIService()
 yahoo_service = YahooFinanceService()
+report_service = ReportService()
 claude_service = ClaudeService()
 cache_manager = CacheManager(app.config.get('CACHE_DIR', 'cache'))
 scheduler = UpdateScheduler()
@@ -251,6 +253,35 @@ def get_news():
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+@app.route('/api/weekly-report', methods=['GET'])
+def get_weekly_report():
+    """Generate weekly market report"""
+    language = request.args.get('language', 'en')
+    
+    try:
+        macro = dashboard_data.get('macro_overview', {})
+        geo = dashboard_data.get('geopolitical_radar', {})
+        sector = dashboard_data.get('sector_scorecard', {})
+        
+        if not macro or not geo or not sector:
+            return jsonify({'status': 'error', 'message': 'Data not ready yet'}), 503
+        
+        macro_data = macro.get('data', {})
+        report = report_service.generate_weekly_report(
+            macro_data=macro_data,
+            geo_data=geo,
+            sector_data=sector,
+            language=language
+        )
+        metadata = report_service.get_report_metadata()
+        
+        return jsonify({
+            'status': 'success',
+            'report': report,
+            'metadata': metadata
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500    
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
