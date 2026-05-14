@@ -2,7 +2,7 @@
 Market Reports Dashboard - Flask Application
 Investor-focused dashboard for macro, geopolitical, and sector analysis
 """
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Response
 from flask_cors import CORS
 import os 
 from dotenv import load_dotenv
@@ -275,11 +275,14 @@ def get_weekly_report():
         )
         metadata = report_service.get_report_metadata()
         
-        return jsonify({
-            'status': 'success',
-            'report': report,
-            'metadata': metadata
-        })
+        return Response(
+            json.dumps({
+                'status': 'success',
+                'report': report,
+                'metadata': metadata
+            }, ensure_ascii=False),
+            mimetype='application/json'
+        )
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500    
 @app.errorhandler(404)
