@@ -285,7 +285,31 @@ def get_weekly_report():
             mimetype='application/json'
         )
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500    
+        return jsonify({'status': 'error', 'message': str(e)}), 500   
+    
+@app.route('/api/fedwatch', methods=['GET'])
+def get_fedwatch():
+    """Get Fed rate probability data from CME FedWatch"""
+    try:
+        import requests
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json'
+        }
+        url = 'https://www.cmegroup.com/CmeWS/mvc/ProbabilityGrid/V2/MeetingProbabilities?venue=XCME&contractCode=ZQ&expiry=2025-12&zone=ET&optionExpiry=0DTE'
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            return jsonify({
+                'status': 'success',
+                'data': response.json()
+            })
+        else:
+            return jsonify({'status': 'error', 'message': f'CME returned {response.status_code}'}), 500
+            
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500 
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
