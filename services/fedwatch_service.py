@@ -57,55 +57,57 @@ class FedWatchService:
         """Calculate rate change probabilities for each FOMC meeting"""
         results = []
         increment = 0.25
-        prev_implied_rate = current_rate  # 前回会合後のレートとして使う
-
+        
+        future_meetings = []
         for meeting in self.FOMC_MEETINGS:
             meeting_date = datetime.strptime(meeting['date'], '%Y-%m-%d')
-
             if meeting_date < datetime.now():
                 continue
-
             month_key = meeting_date.strftime('%Y-%m')
             ticker = self.FUTURES_TICKERS.get(month_key)
-
             if not ticker:
                 continue
-
             price = self.get_futures_price(ticker)
-
             if price is None:
                 continue
-
             implied_rate = round(100 - price, 3)
+            future_meetings.append({
+                'meeting': meeting,
+                'ticker': ticker,
+                'price': price,
+                'implied_rate': implied_rate,
+                'meeting_date': meeting_date
+            })
 
-            # この会合での変化幅（前回比）
-            rate_diff = prev_implied_rate - implied_rate
-
-            if rate_diff >= increment * 0.75:
-                prob_cut = min(round((rate_diff / increment) * 100, 1), 100)
+        for i, m in enumerate(future_meetings):
+            implied_rate = m['implied_rate']
+            
+            if i == 0:
+                # 最初の会合：current_rateからの変化を会合数で割って1回分の確率を出す
+                total_diff = current_rate - implied_rate
+                cuts_expected = total_diff / increment  # 例：2.8回
+                # 1会合あたりの確率に正規化
+                prob_cut = round(min(cuts_expected * 100 / max(len(future_meetings), 1) * 1.5, 100), 1)
                 prob_hold = round(100 - prob_cut, 1)
                 prob_hike = 0
-            elif rate_diff <= -increment * 0.75:
-                prob_hike = min(round((-rate_diff / increment) * 100, 1), 100)
-                prob_hold = round(100 - prob_hike, 1)
-                prob_cut = 0
             else:
-                prob_cut = round((rate_diff / increment) * 100, 1)
+                # 前回会合比
+                prev_implied = future_meetings[i-1]['implied_rate']
+                rate_diff = prev_implied - implied_rate
+                prob_cut = round(min((rate_diff / increment) * 100, 100), 1)
                 prob_hike = 0
-                prob_hold = round(100 - abs(prob_cut), 1)
+                prob_hold = round(100 - max(0, prob_cut), 1)
                 prob_cut = max(0, prob_cut)
 
             results.append({
-                'date': meeting['date'],
-                'label': meeting['label'],
+                'date': m['meeting']['date'],
+                'label': m['meeting']['label'],
                 'implied_rate': implied_rate,
-                'prob_cut': max(0, min(100, prob_cut)),
-                'prob_hold': max(0, min(100, prob_hold)),
-                'prob_hike': max(0, min(100, prob_hike)),
-                'ticker': ticker,
-                'futures_price': price
+                'prob_cut': prob_cut,
+                'prob_hold': prob_hold,
+                'prob_hike': prob_hike,
+                'ticker': m['ticker'],
+                'futures_price': m['price']
             })
-
-            prev_implied_rate = implied_rate  # 次の会合の基準に
 
         return results
