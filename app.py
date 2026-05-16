@@ -289,27 +289,27 @@ def get_weekly_report():
     
 @app.route('/api/fedwatch', methods=['GET'])
 def get_fedwatch():
-    """Get Fed rate probability data from CME FedWatch"""
+    """Get Fed rate probability data from FF futures"""
     try:
-        import requests
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept': 'application/json'
-        }
-        url = 'https://www.cmegroup.com/CmeWS/mvc/ProbabilityGrid/V2/MeetingProbabilities?venue=XCME&contractCode=ZQ&expiry=2025-12&zone=ET&optionExpiry=0DTE'
+        from services.fedwatch_service import FedWatchService
+        fedwatch = FedWatchService()
+        current_rate = 4.33  # Current FF rate
         
-        response = requests.get(url, headers=headers, timeout=10)
+        # Check macro data for current rate
+        if dashboard_data['macro_overview']:
+            macro = dashboard_data['macro_overview'].get('data', {})
+            if macro.get('FF_RATE'):
+                current_rate = macro['FF_RATE']
         
-        if response.status_code == 200:
-            return jsonify({
-                'status': 'success',
-                'data': response.json()
-            })
-        else:
-            return jsonify({'status': 'error', 'message': f'CME returned {response.status_code}'}), 500
-            
+        probabilities = fedwatch.calculate_probabilities(current_rate)
+        
+        return jsonify({
+            'status': 'success',
+            'current_rate': current_rate,
+            'meetings': probabilities
+        })
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500 
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
