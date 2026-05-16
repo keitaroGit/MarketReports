@@ -8,15 +8,11 @@ class FedWatchService:
     
     # FOMC meeting dates 2025-2026
     FOMC_MEETINGS = [
-        {'date': '2025-06-18', 'label': 'Jun 2025'},
-        {'date': '2025-07-30', 'label': 'Jul 2025'},
-        {'date': '2025-09-17', 'label': 'Sep 2025'},
-        {'date': '2025-11-05', 'label': 'Nov 2025'},
-        {'date': '2025-12-17', 'label': 'Dec 2025'},
-        {'date': '2026-01-28', 'label': 'Jan 2026'},
-        {'date': '2026-03-18', 'label': 'Mar 2026'},
-        {'date': '2026-04-29', 'label': 'Apr 2026'},
         {'date': '2026-06-17', 'label': 'Jun 2026'},
+        {'date': '2026-07-28', 'label': 'Jul 2026'},
+        {'date': '2026-09-15', 'label': 'Sep 2026'},
+        {'date': '2026-10-27', 'label': 'Oct 2026'},
+        {'date': '2026-12-15', 'label': 'Dec 2026'},
     ]
     
     # FF Futures ticker mapping (month -> ZQ ticker)
@@ -34,6 +30,12 @@ class FedWatchService:
         '2026-04': 'ZQJ26.CBT',
         '2026-05': 'ZQK26.CBT',
         '2026-06': 'ZQM26.CBT',
+	'2026-07': 'ZQN26.CBT',
+        '2026-08': 'ZQQ26.CBT',
+        '2026-09': 'ZQU26.CBT',
+        '2026-10': 'ZQV26.CBT',
+        '2026-11': 'ZQX26.CBT',
+        '2026-12': 'ZQZ26.CBT',
     }
 
     def get_futures_price(self, ticker):
