@@ -54,10 +54,9 @@ class FedWatchService:
         return None
 
     def calculate_probabilities(self, current_rate=4.33):
-        """Calculate rate change probabilities for each FOMC meeting"""
         results = []
         increment = 0.25
-        
+
         future_meetings = []
         for meeting in self.FOMC_MEETINGS:
             meeting_date = datetime.strptime(meeting['date'], '%Y-%m-%d')
@@ -79,25 +78,32 @@ class FedWatchService:
                 'meeting_date': meeting_date
             })
 
+        n = len(future_meetings)
+        if n == 0:
+            return []
+
+        # 最終会合のimplied_rateから総カット数を計算
+        final_implied = future_meetings[-1]['implied_rate']
+        total_cuts_expected = (current_rate - final_implied) / increment  # 例：2.24回
+
         for i, m in enumerate(future_meetings):
             implied_rate = m['implied_rate']
-            
+            # この会合までの累積カット期待値
+            cumulative_cuts = (current_rate - implied_rate) / increment
+            # 前回会合までの累積カット期待値
             if i == 0:
-                # 最初の会合：current_rateからの変化を会合数で割って1回分の確率を出す
-                total_diff = current_rate - implied_rate
-                cuts_expected = total_diff / increment  # 例：2.8回
-                # 1会合あたりの確率に正規化
-                prob_cut = round(min(cuts_expected * 100 / max(len(future_meetings), 1) * 1.5, 100), 1)
-                prob_hold = round(100 - prob_cut, 1)
-                prob_hike = 0
+                prev_cuts = 0
             else:
-                # 前回会合比
                 prev_implied = future_meetings[i-1]['implied_rate']
-                rate_diff = prev_implied - implied_rate
-                prob_cut = round(min((rate_diff / increment) * 100, 100), 1)
-                prob_hike = 0
-                prob_hold = round(100 - max(0, prob_cut), 1)
-                prob_cut = max(0, prob_cut)
+                prev_cuts = (current_rate - prev_implied) / increment
+
+            # この会合での追加カット期待値
+            marginal_cut = cumulative_cuts - prev_cuts
+
+            # 確率に変換（0〜1回の間を線形補間）
+            prob_cut = round(min(max(marginal_cut * 100, 0), 100), 1)
+            prob_hold = round(100 - prob_cut, 1)
+            prob_hike = 0
 
             results.append({
                 'date': m['meeting']['date'],
