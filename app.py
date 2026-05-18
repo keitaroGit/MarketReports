@@ -2,7 +2,7 @@
 Market Reports Dashboard - Flask Application
 Investor-focused dashboard for macro, geopolitical, and sector analysis
 """
-from flask import Flask, render_template, jsonify, request, Response
+from flask import Flask, render_template, jsonify, request, Response, send_from_directory
 from flask_cors import CORS
 import os 
 import json
@@ -310,6 +310,9 @@ def get_fedwatch():
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+@app.route('/fedwatch-widget')
+def fedwatch_widget():
+    return send_from_directory('.', 'fedwatch_widget.html')
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
