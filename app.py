@@ -301,12 +301,13 @@ def get_fedwatch():
             if macro.get('FF_RATE'):
                 current_rate = macro['FF_RATE']
         
-        probabilities = fedwatch.calculate_probabilities(current_rate)
-        
+        result = fedwatch.calculate_probabilities(current_rate)
+
         return jsonify({
             'status': 'success',
             'current_rate': current_rate,
-            'meetings': probabilities
+            'ranges': result['ranges'],
+            'meetings': result['meetings']
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
