@@ -8,33 +8,33 @@
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'IBM Plex Sans', sans-serif; background: #0a0e17; color: #e0e8f0; padding: 16px; font-size: 13px; }
-  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #4a9eff; letter-spacing: 0.08em; text-transform: uppercase; }
-  .controls { display: flex; align-items: center; gap: 10px; }
+  .header { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #4a9eff; letter-spacing: 0.06em; text-transform: uppercase; }
+  .controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .lang-btn { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 2px; border: 1px solid #1e2a3a; background: transparent; color: #6b7f96; cursor: pointer; transition: all 0.15s; }
   .lang-btn.active { background: #4a9eff; color: #fff; border-color: #4a9eff; }
-  .current-rate { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b7f96; }
+  .current-rate { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b7f96; white-space: nowrap; }
   .current-rate span { color: #e0e8f0; font-weight: 600; }
-  .explanation { background: #0f1724; border: 1px solid #1e2a3a; border-left: 3px solid #4a9eff; border-radius: 3px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.7; font-size: 11.5px; color: #8a9ab0; }
+  .explanation { background: #0f1724; border: 1px solid #1e2a3a; border-left: 3px solid #4a9eff; border-radius: 3px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.75; font-size: 11px; color: #8a9ab0; }
   .explanation strong { color: #c0ccd8; }
-  .explanation .key { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; background: #1a2535; border: 1px solid #2a3a50; border-radius: 2px; padding: 1px 6px; color: #4a9eff; margin: 0 2px; }
-  .table-wrap { overflow-x: auto; border: 1px solid #1e2a3a; border-radius: 4px; }
-  table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-  thead tr:first-child th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #4a9eff; text-align: center; padding: 8px 6px 4px; background: #0c1220; letter-spacing: 0.05em; border-bottom: 1px solid #1e2a3a; }
-  thead tr:first-child th:first-child { text-align: left; color: #6b7f96; }
-  thead tr:last-child th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #4a5a6e; text-align: center; padding: 4px 6px 6px; background: #0c1220; border-bottom: 2px solid #1e2a3a; }
-  thead tr:last-child th:first-child { text-align: left; }
+  .explanation .key { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; background: #1a2535; border: 1px solid #2a3a50; border-radius: 2px; padding: 1px 5px; color: #4a9eff; margin: 0 2px; }
+  .table-wrap { overflow-x: auto; border: 1px solid #1e2a3a; border-radius: 4px; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+  thead tr:first-child th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: #4a9eff; text-align: center; padding: 8px 8px 4px; background: #0c1220; letter-spacing: 0.04em; border-bottom: 1px solid #1e2a3a; }
+  thead tr:first-child th:first-child { text-align: left; color: #6b7f96; padding-left: 10px; }
+  thead tr:last-child th { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #4a5a6e; text-align: center; padding: 3px 8px 6px; background: #0c1220; border-bottom: 2px solid #1e2a3a; }
+  thead tr:last-child th:first-child { text-align: left; padding-left: 10px; }
   tbody tr { border-bottom: 1px solid #0f1724; transition: background 0.12s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: #0f1a2a; }
-  td { padding: 7px 6px; text-align: center; font-family: 'IBM Plex Mono', monospace; color: #4a5a6e; font-size: 10px; }
-  td:first-child { text-align: left; color: #8a9ab0; padding-left: 10px; font-size: 10px; }
-  td.implied { color: #6b8aaa; font-size: 10px; }
+  td { padding: 7px 8px; text-align: center; font-family: 'IBM Plex Mono', monospace; color: #4a5a6e; font-size: 10px; }
+  td:first-child { text-align: left; color: #8a9ab0; padding-left: 10px; }
+  td.implied { color: #6b8aaa; border-left: 1px solid #1e2a3a; }
   .prob-cell.top1 { background: #1a6b3a; color: #86efac; font-weight: 600; }
   .prob-cell.top2 { background: #1a3a6b; color: #93c5fd; font-weight: 600; }
   .prob-cell.nonzero { color: #4a6a8a; }
-  .prob-cell.zero { color: #1e2a3a; }
-  .footer { margin-top: 10px; display: flex; justify-content: space-between; font-size: 9px; color: #2a3a50; font-family: 'IBM Plex Mono', monospace; }
+  .prob-cell.zero { color: #1a2030; }
+  .footer { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: space-between; font-size: 9px; color: #2a3a50; font-family: 'IBM Plex Mono', monospace; }
   .loading { text-align: center; padding: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #2a3a50; letter-spacing: 0.1em; }
   .error { text-align: center; padding: 20px; font-size: 11px; color: #f87171; font-family: 'IBM Plex Mono', monospace; }
 </style>
@@ -52,15 +52,15 @@ const TEXT = {
     impliedRate: 'IMPLIED',
     currentFFR: 'Current FFR',
     source: 'Source: Yahoo Finance (ZQ FF Futures)',
-    explanation: '<strong>What is this?</strong> This table shows the market\'s implied probability of the Federal Reserve setting its policy rate at each range after each FOMC meeting, derived from <span class="key">FF Futures</span> prices.<br><br><strong>How to read:</strong> Each row is an upcoming FOMC meeting. Each column is a possible rate range (e.g. <span class="key">325-350</span> = 3.25%–3.50%). <span class="key" style="background:#1a6b3a;border-color:#1a6b3a;color:#86efac">Green</span> = most likely. <span class="key" style="background:#1a3a6b;border-color:#1a3a6b;color:#93c5fd">Blue</span> = second most likely.<br><br><strong>Example:</strong> If Jun 2026 shows 97% in <span class="key">350-375</span>, the market prices a 97% chance the FFR will be 3.50%–3.75% after June.',
+    explanation: '<strong>What is this?</strong> This table shows the market\'s implied probability of the Fed setting its policy rate at each range after each FOMC meeting, derived from <span class="key">FF Futures</span> prices.<br><br><strong>How to read:</strong> Each row = upcoming FOMC meeting. Each column = possible rate range (e.g. <span class="key">325-350</span> = 3.25%–3.50%). <span class="key" style="background:#1a6b3a;border-color:#1a6b3a;color:#86efac">Green</span> = most likely. <span class="key" style="background:#1a3a6b;border-color:#1a3a6b;color:#93c5fd">Blue</span> = 2nd most likely. Columns with 0% probability are hidden.',
   },
   ja: {
     title: 'FedWatch — FF先物インプライド確率',
     meetingDate: '会合日',
-    impliedRate: 'インプライドレート',
+    impliedRate: 'インプライド',
     currentFFR: '現在のFFR',
     source: 'データ元：Yahoo Finance（ZQ FF先物）',
-    explanation: '<strong>このテーブルの見方</strong>：各行はFOMC会合の日程、各列は会合後に想定される政策金利レンジ（例：<span class="key">325-350</span> = 3.25%〜3.50%）。<span class="key" style="background:#1a6b3a;border-color:#1a6b3a;color:#86efac">緑</span>が最も確率の高いシナリオ、<span class="key" style="background:#1a3a6b;border-color:#1a3a6b;color:#93c5fd">青</span>が2番目です。<br><br><strong>データの仕組み</strong>：FF先物（<span class="key">ZQ Futures</span>）価格から算出したインプライドレートをもとに各会合の金利レンジ確率を逆算しています。<br><br><strong>読み方の例</strong>：Jun 2026の<span class="key">350-375</span>が97%なら、市場は6月会合後のFFRが3.50%〜3.75%になる確率を97%と織り込んでいます。',
+    explanation: '<strong>このテーブルの見方</strong>：各行はFOMC会合の日程、各列は会合後に想定される政策金利レンジ（例：<span class="key">325-350</span> = 3.25%〜3.50%）。<span class="key" style="background:#1a6b3a;border-color:#1a6b3a;color:#86efac">緑</span>が最も確率の高いシナリオ、<span class="key" style="background:#1a3a6b;border-color:#1a3a6b;color:#93c5fd">青</span>が2番目。確率0%の列は非表示にしています。<br><br><strong>データの仕組み</strong>：FF先物（<span class="key">ZQ Futures</span>）価格から算出したインプライドレートをもとに各会合の金利レンジ確率を逆算しています。',
   }
 };
 async function load() {
@@ -76,27 +76,35 @@ function setLang(l) { lang = l; if (cachedData) render(cachedData); }
 function render(data) {
   const t = TEXT[lang];
   const meetings = data.meetings;
-  const ranges = data.ranges;
+  const allRanges = data.ranges;
   const now = new Date().toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
-  const rangeHeaders = ranges.map(r => '<th>' + r + '</th>').join('');
-  const bpHeaders = ranges.map(r => '<th>' + (parseInt(r.split('-')[0])/100).toFixed(2) + '%</th>').join('');
+
+  // Filter out ranges where ALL meetings have 0%
+  const activeRanges = allRanges.filter(r =>
+    meetings.some(m => (m.probabilities[r] || 0) > 0)
+  );
+
+  const rangeHeaders = activeRanges.map(r => '<th>' + r + '</th>').join('');
+  const bpHeaders = activeRanges.map(r => '<th>' + (parseInt(r.split('-')[0])/100).toFixed(2) + '%</th>').join('');
+
   const rows = meetings.map(m => {
     const probs = m.probabilities;
-    const vals = ranges.map(r => probs[r] || 0);
+    const vals = activeRanges.map(r => probs[r] || 0);
     const max1 = Math.max(...vals);
     const sorted = [...vals].sort((a,b) => b-a);
     const max2 = sorted[1];
-    const cells = ranges.map(r => {
+    const cells = activeRanges.map(r => {
       const v = probs[r] || 0;
       let cls = 'prob-cell';
       if (v === max1 && v > 0) cls += ' top1';
       else if (v === max2 && v > 0 && v !== max1) cls += ' top2';
       else if (v > 0) cls += ' nonzero';
       else cls += ' zero';
-      return '<td class="' + cls + '">' + (v > 0 ? v.toFixed(2) + '%' : '—') + '</td>';
+      return '<td class="' + cls + '">' + (v > 0 ? v.toFixed(2) + '%' : '') + '</td>';
     }).join('');
     return '<tr><td>' + m.date + '</td>' + cells + '<td class="implied">' + m.implied_rate.toFixed(3) + '%</td></tr>';
   }).join('');
+
   document.getElementById('app').innerHTML =
     '<div class="header"><div class="title">' + t.title + '</div><div class="controls"><button class="lang-btn ' + (lang==='en'?'active':'') + '" onclick="setLang(\'en\')">EN</button><button class="lang-btn ' + (lang==='ja'?'active':'') + '" onclick="setLang(\'ja\')">JA</button><div class="current-rate">' + t.currentFFR + ' <span>' + data.current_rate + '%</span></div></div></div>' +
     '<div class="explanation">' + t.explanation + '</div>' +
