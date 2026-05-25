@@ -311,6 +311,19 @@ def get_fedwatch():
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+@app.route('/api/calendar')
+def get_calendar():
+    import json
+    try:
+        with open('calendar_data.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/calendar-widget')
+def calendar_widget():
+    return send_from_directory('.', 'calendar_widget.html')    
 @app.route('/fedwatch-widget')
 def fedwatch_widget():
     return send_from_directory('.', 'fedwatch_widget.html')
