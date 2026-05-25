@@ -153,7 +153,7 @@ function render(data) {
     groups[e.date].push(e);
   });
 
-  const dates = Object.keys(groups).sort();
+  const dates = Object.keys(groups).sort().reverse();
 
   const html = dates.map(date => {
     const today = isToday(date);
