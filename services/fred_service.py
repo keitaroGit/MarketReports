@@ -160,7 +160,8 @@ class FREDService:
             })
 
         # Sort by date
-        events.sort(key=lambda x: x['date'])
+        # Sort by date descending (most recent first)
+        events.sort(key=lambda x: x['date'], reverse=True)
         return {'updated': str(today), 'events': events}
 
     def get_macroeconomic_data(self):
