@@ -313,10 +313,10 @@ def get_fedwatch():
         return jsonify({'status': 'error', 'message': str(e)}), 500
 @app.route('/api/calendar')
 def get_calendar():
-    import json
     try:
-        with open('calendar_data.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        from services.fred_service import FREDService
+        fred = FREDService()
+        data = fred.get_calendar_data()
         return jsonify(data)
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
