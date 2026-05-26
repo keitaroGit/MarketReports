@@ -395,16 +395,18 @@ def get_company_analysis():
         if lang == 'ja':
             prompt = f"""${ticker}について以下の情報を調べてJSON形式のみで返してください（他のテキスト不要）：
 {{
-  "company_name": "正式社名",
-  "industry": "業界",
+  "company_name": "正式社名（英語）",
+  "industry": "業界（英語）",
   "founded": "設立年",
-  "headquarters": "本社所在地",
-  "overview": "事業概要（3文）",
-  "products": ["主要製品/サービス1", "主要製品/サービス2", "主要製品/サービス3"],
-  "major_shareholders": ["大株主1", "大株主2", "大株主3"],
-  "partners": ["主要パートナー1", "主要パートナー2", "主要パートナー3"],
-  "competitors": ["競合1", "競合2", "競合3"],
-  "recent_news": ["最近の動向1", "最近の動向2"]
+  "headquarters": "本社所在地（英語）",
+  "origin_country": "発祥国（日本語）",
+  "overview": "事業概要を日本語3文で",
+  "products": ["主要製品/サービス1（英語名）", "主要製品/サービス2（英語名）", "主要製品/サービス3（英語名）"],
+  "major_customers": ["主要顧客1（英語名）", "主要顧客2（英語名）", "主要顧客3（英語名）"],
+  "major_shareholders": ["大株主1（英語名）", "大株主2（英語名）", "大株主3（英語名）"],
+  "partners": ["主要パートナー1（英語名）", "主要パートナー2（英語名）", "主要パートナー3（英語名）"],
+  "competitors": ["競合1（英語名）", "競合2（英語名）", "競合3（英語名）"],
+  "recent_news": ["最近の動向1を日本語で", "最近の動向2を日本語で"]
 }}"""
         else:
             prompt = f"""Research ${ticker} and respond ONLY with JSON (no other text):
@@ -413,8 +415,10 @@ def get_company_analysis():
   "industry": "industry sector",
   "founded": "founding year",
   "headquarters": "HQ location",
+  "origin_country": "country of origin",
   "overview": "3-sentence business overview",
   "products": ["key product/service 1", "key product/service 2", "key product/service 3"],
+  "major_customers": ["major customer 1", "major customer 2", "major customer 3"],
   "major_shareholders": ["major shareholder 1", "major shareholder 2", "major shareholder 3"],
   "partners": ["key partner 1", "key partner 2", "key partner 3"],
   "competitors": ["competitor 1", "competitor 2", "competitor 3"],

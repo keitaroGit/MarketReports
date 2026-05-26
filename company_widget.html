@@ -112,8 +112,8 @@ let finData = null;
 let aiData = null;
 
 const L = {
-  en: { mktcap:'MKT CAP', revenue:'REVENUE', pe:'P/E', eps:'EPS', div:'DIVIDEND', high52:'52W HIGH', low52:'52W LOW', overview:'BUSINESS OVERVIEW', products:'PRODUCTS & SERVICES', shareholders:'MAJOR SHAREHOLDERS', partners:'KEY PARTNERS', competitors:'COMPETITORS', news:'RECENT DEVELOPMENTS', analyzing:'RESEARCHING WITH AI...' },
-  ja: { mktcap:'時価総額', revenue:'売上高', pe:'PER', eps:'EPS', div:'配当', high52:'52週高値', low52:'52週安値', overview:'事業概要', products:'製品・サービス', shareholders:'大株主', partners:'主要パートナー', competitors:'競合他社', news:'最近の動向', analyzing:'AI調査中...' }
+  en: { mktcap:'MKT CAP', revenue:'REVENUE', pe:'P/E', eps:'EPS', div:'DIVIDEND', high52:'52W HIGH', low52:'52W LOW', overview:'BUSINESS OVERVIEW', products:'PRODUCTS & SERVICES', shareholders:'MAJOR SHAREHOLDERS', partners:'KEY PARTNERS', competitors:'COMPETITORS', news:'RECENT DEVELOPMENTS', analyzing:'RESEARCHING WITH AI...', customers:'MAJOR CUSTOMERS', hq:'HEADQUARTERS', origin:'ORIGIN' },
+  ja: { mktcap:'時価総額', revenue:'売上高', pe:'PER', eps:'EPS', div:'配当', high52:'52週高値', low52:'52週安値', overview:'事業概要', products:'製品・サービス', shareholders:'大株主', partners:'主要パートナー', competitors:'競合他社', news:'最近の動向', analyzing:'AI調査中...', customers:'主要顧客', hq:'本社', origin:'発祥国' }
 };
 
 function setLang(l) {
@@ -199,8 +199,8 @@ function render(d, ai) {
     aiSection += '<div class="loading">' + t.analyzing + '</div>';
   } else {
     aiSection += '<div class="info-grid">' +
-      '<div class="info-card cyan"><div class="info-card-title">◆ ' + t.overview + '</div><div class="info-text">' + (ai.overview || '') + '</div></div>' +
-      '<div class="info-card pink"><div class="info-card-title">◆ ' + t.products + '</div><div class="tag-list">' + (ai.products || []).map(p => '<span class="tag pink">' + p + '</span>').join('') + '</div></div>' +
+      '<div class="info-card cyan"><div class="info-card-title">◆ ' + t.overview + '</div><div class="info-text">' + (ai.overview || '') + '</div></div>' +'<div class="info-card purple"><div class="info-card-title">◆ ' + t.hq + '</div><div class="info-text">' + (ai.headquarters || 'N/A') + '<br><span style="color:#e91e8c">' + (ai.origin_country || '') + '</span></div></div>' +
+      '<div class="info-card pink"><div class="info-card-title">◆ ' + t.products + '</div><div class="tag-list">' + (ai.products || []).map(p => '<span class="tag pink">' + p + '</span>').join('') + '</div></div>' +'<div class="info-card orange"><div class="info-card-title">◆ ' + t.customers + '</div><div class="tag-list">' + (ai.major_customers || []).map(c => '<span class="tag orange">' + c + '</span>').join('') + '</div></div>' +
       '<div class="info-card purple"><div class="info-card-title">◆ ' + t.shareholders + '</div><div class="tag-list">' + (ai.major_shareholders || []).map(s => '<span class="tag purple">' + s + '</span>').join('') + '</div></div>' +
       '<div class="info-card green"><div class="info-card-title">◆ ' + t.partners + '</div><div class="tag-list">' + (ai.partners || []).map(p => '<span class="tag green">' + p + '</span>').join('') + '</div></div>' +
       '<div class="info-card orange"><div class="info-card-title">◆ ' + t.competitors + '</div><div class="tag-list">' + (ai.competitors || []).map(c => '<span class="tag orange">' + c + '</span>').join('') + '</div></div>' +
