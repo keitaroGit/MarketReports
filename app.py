@@ -333,7 +333,8 @@ def get_company():
         # Company overview
         ov_res = req.get(f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={api_key}', timeout=15)
         ov = ov_res.json() if ov_res.status_code == 200 else {}
-
+        import time
+        time.sleep(1)
         # Global quote (price)
         q_res = req.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={api_key}', timeout=15)
         q = q_res.json().get('Global Quote', {}) if q_res.status_code == 200 else {}
