@@ -329,6 +329,7 @@ def get_company():
     try:
         import requests as req
         api_key = os.getenv('FINNHUB_API_KEY')
+        print(f"FINNHUB_API_KEY: {api_key[:8] if api_key else 'NONE'}")
         headers = {'X-Finnhub-Token': api_key}
 
         # Quote (price)
