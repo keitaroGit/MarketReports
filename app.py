@@ -328,58 +328,51 @@ def get_company():
         return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
     try:
         import requests as req
-        api_key = os.getenv('FINNHUB_API_KEY', 'd8aeqqhr01ql25r79eb0')
-        print(f"FINNHUB_API_KEY: {api_key[:8] if api_key else 'NONE'}")
-        headers = {'X-Finnhub-Token': api_key}
+        api_key = os.getenv('ALPHAVANTAGE_API_KEY', 'O4JKJ5C6QPRE5JVG')
 
-        # Quote (price)
-        quote_res = req.get(f'https://finnhub.io/api/v1/quote?symbol={ticker}', headers=headers, timeout=10)
-        quote = quote_res.json() if quote_res.status_code == 200 else {}
+        # Company overview
+        ov_res = req.get(f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={api_key}', timeout=15)
+        ov = ov_res.json() if ov_res.status_code == 200 else {}
 
-        # Company profile
-        profile_res = req.get(f'https://finnhub.io/api/v1/stock/profile2?symbol={ticker}', headers=headers, timeout=10)
-        profile = profile_res.json() if profile_res.status_code == 200 else {}
+        # Global quote (price)
+        q_res = req.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={api_key}', timeout=15)
+        q = q_res.json().get('Global Quote', {}) if q_res.status_code == 200 else {}
 
-        # Basic financials
-        fin_res = req.get(f'https://finnhub.io/api/v1/stock/metric?symbol={ticker}&metric=all', headers=headers, timeout=10)
-        fin = fin_res.json().get('metric', {}) if fin_res.status_code == 200 else {}
-
-        if not profile or not profile.get('name'):
-            return jsonify({'status': 'error', 'message': 'Ticker not found', 'debug': {'profile': profile, 'key_prefix': api_key[:8] if api_key else 'NONE'}}), 404
+        if not ov or not ov.get('Name'):
+            return jsonify({'status': 'error', 'message': 'Ticker not found'}), 404
 
         def fmt(n):
-            if n is None: return 'N/A'
-            if abs(n) >= 1e12: return f'${n/1e12:.2f}T'
-            if abs(n) >= 1e9: return f'${n/1e9:.2f}B'
-            if abs(n) >= 1e6: return f'${n/1e6:.2f}M'
-            return f'{n:,.0f}'
+            try:
+                n = float(n)
+                if abs(n) >= 1e12: return f'${n/1e12:.2f}T'
+                if abs(n) >= 1e9: return f'${n/1e9:.2f}B'
+                if abs(n) >= 1e6: return f'${n/1e6:.2f}M'
+                return f'{n:,.0f}'
+            except: return 'N/A'
 
-        price = quote.get('c')
-        prev = quote.get('pc')
+        price = float(q.get('05. price', 0)) or None
+        prev = float(q.get('08. previous close', 0)) or None
         change_pct = ((price - prev) / prev) if price and prev else None
-
-        mktcap = profile.get('marketCapitalization')
-        mktcap_fmt = fmt(mktcap * 1e6) if mktcap else 'N/A'
 
         info = {
             'ticker': ticker,
-            'name': profile.get('name', ticker),
-            'sector': profile.get('finnhubIndustry', 'N/A'),
-            'industry': profile.get('finnhubIndustry', 'N/A'),
-            'country': profile.get('country', 'N/A'),
-            'employees': f"{profile.get('employeeTotal', 0):,}" if profile.get('employeeTotal') else 'N/A',
+            'name': ov.get('Name', ticker),
+            'sector': ov.get('Sector', 'N/A'),
+            'industry': ov.get('Industry', 'N/A'),
+            'country': ov.get('Country', 'N/A'),
+            'employees': f"{int(ov.get('FullTimeEmployees', 0)):,}" if ov.get('FullTimeEmployees') else 'N/A',
             'price': price,
             'change_pct': change_pct,
-            'market_cap': mktcap_fmt,
-            'revenue': fmt(fin.get('revenuePerShareTTM') and fin.get('revenuePerShareTTM') * fin.get('shareOutstanding', 0) * 1e6),
-            'net_income': 'N/A',
-            'pe_ratio': round(fin.get('peTTM'), 1) if fin.get('peTTM') else 'N/A',
-            'eps': round(fin.get('epsTTM'), 2) if fin.get('epsTTM') else 'N/A',
-            'dividend_yield': f"{fin.get('dividendYieldIndicatedAnnual', 0):.2f}%" if fin.get('dividendYieldIndicatedAnnual') else 'N/A',
-            'week52_high': fin.get('52WeekHigh'),
-            'week52_low': fin.get('52WeekLow'),
-            'description': f"{profile.get('name')} is listed on {profile.get('exchange')} under ticker {ticker}. Industry: {profile.get('finnhubIndustry')}. IPO: {profile.get('ipo')}. Website: {profile.get('weburl')}",
-            'website': profile.get('weburl', ''),
+            'market_cap': fmt(ov.get('MarketCapitalization')),
+            'revenue': fmt(ov.get('RevenueTTM')),
+            'net_income': fmt(ov.get('NetIncomeTTM')),
+            'pe_ratio': ov.get('TrailingPE', 'N/A'),
+            'eps': ov.get('EPS', 'N/A'),
+            'dividend_yield': f"{float(ov.get('DividendYield', 0))*100:.2f}%" if ov.get('DividendYield') and ov.get('DividendYield') != 'None' else 'N/A',
+            'week52_high': float(ov.get('52WeekHigh', 0)) or None,
+            'week52_low': float(ov.get('52WeekLow', 0)) or None,
+            'description': ov.get('Description', ''),
+            'website': '',
         }
         return jsonify({'status': 'success', 'data': info})
     except Exception as e:
