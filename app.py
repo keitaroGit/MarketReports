@@ -328,7 +328,7 @@ def get_company():
         return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
     try:
         import requests as req
-        api_key = os.getenv('FINNHUB_API_KEY')
+        api_key = os.getenv('FINNHUB_API_KEY', 'd8aeqqhr01ql25r79eb0')
         print(f"FINNHUB_API_KEY: {api_key[:8] if api_key else 'NONE'}")
         headers = {'X-Finnhub-Token': api_key}
 
