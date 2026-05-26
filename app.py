@@ -345,7 +345,7 @@ def get_company():
         fin = fin_res.json().get('metric', {}) if fin_res.status_code == 200 else {}
 
         if not profile or not profile.get('name'):
-            return jsonify({'status': 'error', 'message': 'Ticker not found'}), 404
+            return jsonify({'status': 'error', 'message': 'Ticker not found', 'debug': {'profile': profile, 'key_prefix': api_key[:8] if api_key else 'NONE'}}), 404
 
         def fmt(n):
             if n is None: return 'N/A'
