@@ -330,10 +330,13 @@ def get_company():
         import requests as req
         import time
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://finance.yahoo.com',
+            'Origin': 'https://finance.yahoo.com',
         }
-        url = f'https://query1.finance.yahoo.com/v10/finance/quoteSummary/{ticker}'
+        url = f'https://query2.finance.yahoo.com/v10/finance/quoteSummary/{ticker}'
         params = {
             'modules': 'summaryProfile,financialData,defaultKeyStatistics,assetProfile',
             'corsDomain': 'finance.yahoo.com'
