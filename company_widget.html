@@ -7,72 +7,81 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'IBM Plex Sans', sans-serif; background: #fff0f5; color: #1a1a2e; padding: 16px; min-height: 100vh; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: #0d0d1a; color: #e0e8f0; padding: 16px; min-height: 100vh; }
 
   .header { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em; color: #e91e8c; }
-  .title span { color: #1a1a2e; }
+  .title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em; color: #ff6eb4; }
+  .title span { color: #fff; }
   .controls { display: flex; gap: 8px; }
   .lang-btn { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 4px 12px; border-radius: 20px; border: 1.5px solid #e91e8c; background: transparent; color: #e91e8c; cursor: pointer; transition: all 0.15s; }
   .lang-btn.active { background: #e91e8c; color: #fff; }
 
   .search-bar { display: flex; gap: 8px; margin-bottom: 20px; }
-  .search-input { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; background: #fff; border: 2px solid #f9a8d4; border-radius: 8px; padding: 10px 16px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.1em; outline: none; transition: border-color 0.15s; box-shadow: 0 2px 8px rgba(233,30,140,0.08); }
+  .search-input { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; background: #1a1a2e; border: 2px solid #3d2b4e; border-radius: 8px; padding: 10px 16px; color: #fff; text-transform: uppercase; letter-spacing: 0.1em; outline: none; transition: border-color 0.15s; }
   .search-input:focus { border-color: #e91e8c; }
-  .search-input::placeholder { color: #f9a8d4; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .search-input::placeholder { color: #4a3a5e; font-weight: 400; text-transform: none; letter-spacing: 0; }
   .search-btn { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 0.1em; background: linear-gradient(135deg, #e91e8c, #ff6eb4); color: #fff; border: none; border-radius: 8px; padding: 10px 24px; cursor: pointer; transition: opacity 0.15s; box-shadow: 0 4px 12px rgba(233,30,140,0.3); }
   .search-btn:hover { opacity: 0.9; }
-  .search-btn:disabled { background: #f9a8d4; box-shadow: none; cursor: not-allowed; }
+  .search-btn:disabled { background: #3d2b4e; box-shadow: none; cursor: not-allowed; color: #6b5a7e; }
 
-  .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(233,30,140,0.12); border: 1px solid #fce7f3; }
-
-  .card-header { background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%); padding: 20px 24px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+  /* Top card */
+  .top-card { background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; border: 1px solid #3d2b4e; box-shadow: 0 4px 24px rgba(233,30,140,0.15); }
   .company-info { flex: 1; }
   .ticker-badge { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; background: #e91e8c; color: #fff; border-radius: 4px; padding: 2px 8px; margin-bottom: 6px; }
   .company-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 4px; }
   .company-meta { font-size: 11px; color: #a78bfa; }
   .price-block { text-align: right; }
   .price { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.05em; color: #fff; line-height: 1; }
-  .price-change { font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 4px; }
-  .price-change.up { color: #4ade80; }
-  .price-change.down { color: #f87171; }
-  .price-na { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #6b7280; }
+  .price-change.up { color: #4ade80; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .price-change.down { color: #f87171; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
 
-  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
-  .metric { padding: 14px 16px; border-right: 1px solid #fce7f3; border-bottom: 1px solid #fce7f3; background: #fff; }
-  .metric:hover { background: #fff0f5; }
-  .metric-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: #f472b6; margin-bottom: 4px; }
-  .metric-value { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: #1a1a2e; }
+  /* Metrics row */
+  .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .metric-card { background: #1a1a2e; border: 1px solid #2d2b4e; border-radius: 8px; padding: 12px; transition: border-color 0.15s; }
+  .metric-card:hover { border-color: #e91e8c; }
+  .metric-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: #e91e8c; margin-bottom: 4px; }
+  .metric-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #fff; }
 
-  .week52-bar { margin-top: 6px; height: 4px; background: #fce7f3; border-radius: 2px; }
-  .week52-fill { height: 100%; background: linear-gradient(90deg, #e91e8c, #ff6eb4); border-radius: 2px; }
-  .week52-labels { display: flex; justify-content: space-between; font-size: 8px; color: #f472b6; margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+  /* Info grid */
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .info-card { background: #1a1a2e; border-radius: 10px; padding: 16px; border: 1px solid #2d2b4e; }
+  .info-card.cyan { border-top: 3px solid #06b6d4; }
+  .info-card.pink { border-top: 3px solid #e91e8c; }
+  .info-card.purple { border-top: 3px solid #a855f7; }
+  .info-card.green { border-top: 3px solid #22c55e; }
+  .info-card.orange { border-top: 3px solid #f97316; }
+  .info-card.yellow { border-top: 3px solid #eab308; }
+  .info-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 0.1em; margin-bottom: 10px; }
+  .info-card.cyan .info-card-title { color: #06b6d4; }
+  .info-card.pink .info-card-title { color: #e91e8c; }
+  .info-card.purple .info-card-title { color: #a855f7; }
+  .info-card.green .info-card-title { color: #22c55e; }
+  .info-card.orange .info-card-title { color: #f97316; }
+  .info-card.yellow .info-card-title { color: #eab308; }
 
-  .card-body { padding: 20px 24px; }
-  .section { margin-bottom: 20px; }
-  .section:last-child { margin-bottom: 0; }
-  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 0.1em; color: #e91e8c; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #fce7f3; }
-  .section-text { font-size: 12px; color: #4b5563; line-height: 1.8; }
+  .info-text { font-size: 11px; color: #9ca3af; line-height: 1.75; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; }
+  .tag.cyan { background: #0e4a5a; color: #67e8f9; border: 1px solid #06b6d4; }
+  .tag.pink { background: #4a0e2d; color: #f9a8d4; border: 1px solid #e91e8c; }
+  .tag.purple { background: #2e0e4a; color: #d8b4fe; border: 1px solid #a855f7; }
+  .tag.green { background: #0e2e1a; color: #86efac; border: 1px solid #22c55e; }
+  .tag.orange { background: #4a2a0e; color: #fed7aa; border: 1px solid #f97316; }
+  .tag.yellow { background: #3a2e0e; color: #fef08a; border: 1px solid #eab308; }
 
-  .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 500px) { .ai-grid { grid-template-columns: 1fr; } }
-  .ai-box { border-radius: 8px; padding: 14px; }
-  .ai-box.strengths { background: #f0fdf4; border: 1px solid #86efac; }
-  .ai-box.risks { background: #fff1f2; border: 1px solid #fda4af; }
-  .ai-box-title { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 0.08em; margin-bottom: 8px; }
-  .ai-box.strengths .ai-box-title { color: #16a34a; }
-  .ai-box.risks .ai-box-title { color: #e11d48; }
-  .ai-box ul { list-style: none; }
-  .ai-box ul li { font-size: 11px; color: #374151; line-height: 1.6; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
-  .ai-box ul li:last-child { border-bottom: none; }
-  .ai-box.strengths ul li::before { content: '✓ '; color: #16a34a; font-weight: 600; }
-  .ai-box.risks ul li::before { content: '! '; color: #e11d48; font-weight: 600; }
+  .news-item { font-size: 11px; color: #9ca3af; padding: 6px 0; border-bottom: 1px solid #2d2b4e; line-height: 1.5; }
+  .news-item:last-child { border-bottom: none; }
+  .news-item::before { content: '▸ '; color: #eab308; }
 
-  .loading-ai { text-align: center; padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #f472b6; letter-spacing: 0.1em; }
-  .error-msg { text-align: center; padding: 20px; font-size: 12px; color: #e11d48; font-family: 'IBM Plex Mono', monospace; }
+  .loading { text-align: center; padding: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #e91e8c; letter-spacing: 0.1em; }
+  .error-msg { text-align: center; padding: 20px; font-size: 12px; color: #f87171; font-family: 'IBM Plex Mono', monospace; }
   .placeholder { text-align: center; padding: 50px 20px; }
-  .placeholder-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em; color: #f472b6; margin-bottom: 8px; }
-  .placeholder-examples { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #f9a8d4; }
+  .placeholder-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.1em; color: #e91e8c; margin-bottom: 8px; }
+  .placeholder-examples { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #4a3a5e; }
+
+  .week52-bar { margin-top: 6px; height: 3px; background: #2d2b4e; border-radius: 2px; }
+  .week52-fill { height: 100%; background: linear-gradient(90deg, #e91e8c, #ff6eb4); border-radius: 2px; }
+  .week52-labels { display: flex; justify-content: space-between; font-size: 8px; color: #4a3a5e; margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
 </style>
 </head>
 <body>
@@ -99,19 +108,19 @@
 <script>
 const API_BASE = 'https://marketreports-production.up.railway.app';
 let lang = 'en';
-let currentData = null;
-let currentAI = null;
+let finData = null;
+let aiData = null;
 
 const L = {
-  en: { overview:'Business Overview', strengths:'Key Strengths', risks:'Key Risks', employees:'Employees', sector:'Sector', industry:'Industry', country:'Country', mktcap:'Mkt Cap', revenue:'Revenue', netincome:'Net Income', pe:'P/E', eps:'EPS', div:'Dividend', high52:'52W High', low52:'52W Low', analyzing:'ANALYZING...', aiUnavailable:'AI analysis unavailable' },
-  ja: { overview:'ビジネス概要', strengths:'主な強み', risks:'主なリスク', employees:'従業員数', sector:'セクター', industry:'業種', country:'国', mktcap:'時価総額', revenue:'売上高', netincome:'純利益', pe:'PER', eps:'EPS', div:'配当', high52:'52週高値', low52:'52週安値', analyzing:'AI分析中...', aiUnavailable:'AI分析利用不可' }
+  en: { mktcap:'MKT CAP', revenue:'REVENUE', pe:'P/E', eps:'EPS', div:'DIVIDEND', high52:'52W HIGH', low52:'52W LOW', overview:'BUSINESS OVERVIEW', products:'PRODUCTS & SERVICES', shareholders:'MAJOR SHAREHOLDERS', partners:'KEY PARTNERS', competitors:'COMPETITORS', news:'RECENT DEVELOPMENTS', analyzing:'RESEARCHING WITH AI...' },
+  ja: { mktcap:'時価総額', revenue:'売上高', pe:'PER', eps:'EPS', div:'配当', high52:'52週高値', low52:'52週安値', overview:'事業概要', products:'製品・サービス', shareholders:'大株主', partners:'主要パートナー', competitors:'競合他社', news:'最近の動向', analyzing:'AI調査中...' }
 };
 
 function setLang(l) {
   lang = l;
   document.getElementById('btn-en').className = 'lang-btn' + (l==='en'?' active':'');
   document.getElementById('btn-ja').className = 'lang-btn' + (l==='ja'?' active':'');
-  if (currentData) renderCard(currentData, currentAI);
+  if (finData) render(finData, aiData);
 }
 
 document.getElementById('ticker-input').addEventListener('keydown', e => { if (e.key==='Enter') search(); });
@@ -122,44 +131,47 @@ async function search() {
   const btn = document.getElementById('search-btn');
   btn.disabled = true;
   btn.textContent = '...';
-  document.getElementById('result').innerHTML = '<div class="loading-ai">LOADING DATA...</div>';
+  finData = null; aiData = null;
+
+  document.getElementById('result').innerHTML = '<div class="loading">LOADING FINANCIAL DATA...</div>';
+
+  // Fetch financial data
   try {
     const res = await fetch(API_BASE + '/api/company?ticker=' + ticker);
     const json = await res.json();
     if (json.status !== 'success') throw new Error(json.message || 'Not found');
-    currentData = json.data;
-    currentAI = null;
-    renderCard(currentData, null);
-    fetchAI(ticker);
+    finData = json.data;
+    render(finData, null);
   } catch(e) {
     document.getElementById('result').innerHTML = '<div class="error-msg">❌ ' + e.message + '</div>';
+    btn.disabled = false;
+    btn.textContent = 'SEARCH';
+    return;
   }
+
   btn.disabled = false;
   btn.textContent = 'SEARCH';
+
+  // Fetch AI analysis
+  fetchAI(ticker);
 }
 
 async function fetchAI(ticker) {
-  const aiEl = document.getElementById('ai-content');
-  if (aiEl) aiEl.innerHTML = '<div class="loading-ai">' + L[lang].analyzing + '</div>';
+  const aiEl = document.getElementById('ai-section');
+  if (aiEl) aiEl.innerHTML = '<div class="loading">' + L[lang].analyzing + '</div>';
   try {
-    const prompt = lang === 'ja'
-      ? ticker + 'について以下のみJSON形式で返してください：{"overview":"3文で事業概要","strengths":["強み1","強み2","強み3"],"risks":["リスク1","リスク2","リスク3"]}'
-      : 'For ' + ticker + ', respond ONLY with JSON: {"overview":"3-sentence business overview","strengths":["s1","s2","s3"],"risks":["r1","r2","r3"]}';
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
-    });
-    const data = await res.json();
-    const text = data.content[0].text;
-    currentAI = JSON.parse(text.replace(/```json|```/g, '').trim());
-    renderCard(currentData, currentAI);
+    const res = await fetch(API_BASE + '/api/company-analysis?ticker=' + ticker + '&lang=' + lang);
+    const json = await res.json();
+    if (json.status === 'success') {
+      aiData = json.data;
+      render(finData, aiData);
+    }
   } catch(e) {
-    if (aiEl) aiEl.innerHTML = '<div class="loading-ai" style="color:#e11d48">' + L[lang].aiUnavailable + '</div>';
+    if (aiEl) aiEl.innerHTML = '<div class="error-msg">AI analysis unavailable</div>';
   }
 }
 
-function renderCard(d, ai) {
+function render(d, ai) {
   const t = L[lang];
   const changePct = d.change_pct ? (d.change_pct * 100).toFixed(2) : null;
   const changeClass = changePct >= 0 ? 'up' : 'down';
@@ -167,30 +179,37 @@ function renderCard(d, ai) {
   const price52pct = d.week52_high && d.week52_low && d.price
     ? Math.round(((d.price - d.week52_low) / (d.week52_high - d.week52_low)) * 100) : null;
 
-  const priceHTML = d.price
-    ? '<div class="price">$' + d.price.toFixed(2) + '</div>' + (changePct !== null ? '<div class="price-change ' + changeClass + '">' + changeSign + changePct + '%</div>' : '')
-    : '<div class="price-na">Price N/A</div>';
+  const name = (ai && ai.company_name) ? ai.company_name : d.name;
+  const industry = (ai && ai.industry) ? ai.industry : d.industry;
+  const hq = (ai && ai.headquarters) ? ai.headquarters : d.country;
 
-  const aiHTML = ai
-    ? '<div class="ai-grid"><div class="ai-box strengths"><div class="ai-box-title">✦ ' + t.strengths + '</div><ul>' + ai.strengths.map(s=>'<li>'+s+'</li>').join('') + '</ul></div><div class="ai-box risks"><div class="ai-box-title">⚠ ' + t.risks + '</div><ul>' + ai.risks.map(r=>'<li>'+r+'</li>').join('') + '</ul></div></div>'
-    : '<div class="loading-ai" id="ai-content">' + t.analyzing + '</div>';
+  const topCard = '<div class="top-card"><div class="company-info"><div class="ticker-badge">' + d.ticker + '</div><div class="company-name">' + name + '</div><div class="company-meta">' + industry + ' · ' + hq + (ai && ai.founded ? ' · Est. ' + ai.founded : '') + '</div></div><div class="price-block"><div class="price">' + (d.price ? '$' + d.price.toFixed(2) : 'N/A') + '</div>' + (changePct !== null ? '<div class="price-change ' + changeClass + '">' + changeSign + changePct + '%</div>' : '') + '</div></div>';
 
-  const overviewText = ai ? ai.overview : (d.description ? d.description.substring(0, 400) + '...' : '');
+  const metricsRow = '<div class="metrics-row">' +
+    '<div class="metric-card"><div class="metric-label">' + t.mktcap + '</div><div class="metric-value">' + d.market_cap + '</div></div>' +
+    '<div class="metric-card"><div class="metric-label">' + t.revenue + '</div><div class="metric-value">' + d.revenue + '</div></div>' +
+    '<div class="metric-card"><div class="metric-label">' + t.pe + '</div><div class="metric-value">' + d.pe_ratio + '</div></div>' +
+    '<div class="metric-card"><div class="metric-label">' + t.eps + '</div><div class="metric-value">' + (d.eps ? '$' + parseFloat(d.eps).toFixed(2) : 'N/A') + '</div></div>' +
+    '<div class="metric-card"><div class="metric-label">' + t.div + '</div><div class="metric-value">' + d.dividend_yield + '</div></div>' +
+    '<div class="metric-card"><div class="metric-label">' + t.high52 + ' / ' + t.low52 + '</div><div class="metric-value">' + (d.week52_high ? '$' + d.week52_high.toFixed(2) : 'N/A') + ' / ' + (d.week52_low ? '$' + d.week52_low.toFixed(2) : 'N/A') + '</div>' + (price52pct !== null ? '<div class="week52-bar"><div class="week52-fill" style="width:' + price52pct + '%"></div></div><div class="week52-labels"><span>L</span><span style="color:#e91e8c">' + price52pct + '%</span><span>H</span></div>' : '') + '</div>' +
+    '</div>';
 
-  document.getElementById('result').innerHTML =
-    '<div class="card">' +
-    '<div class="card-header"><div class="company-info"><div class="ticker-badge">' + d.ticker + '</div><div class="company-name">' + d.name + '</div><div class="company-meta">' + d.sector + ' · ' + d.industry + ' · ' + d.country + ' · ' + t.employees + ': ' + d.employees + '</div></div><div class="price-block">' + priceHTML + '</div></div>' +
-    '<div class="metrics-grid">' +
-    '<div class="metric"><div class="metric-label">' + t.mktcap + '</div><div class="metric-value">' + d.market_cap + '</div></div>' +
-    '<div class="metric"><div class="metric-label">' + t.revenue + '</div><div class="metric-value">' + d.revenue + '</div></div>' +
-    '<div class="metric"><div class="metric-label">' + t.netincome + '</div><div class="metric-value">' + d.net_income + '</div></div>' +
-    '<div class="metric"><div class="metric-label">' + t.pe + '</div><div class="metric-value">' + d.pe_ratio + '</div></div>' +
-    '<div class="metric"><div class="metric-label">' + t.eps + '</div><div class="metric-value">' + (d.eps ? '$'+parseFloat(d.eps).toFixed(2) : 'N/A') + '</div></div>' +
-    '<div class="metric"><div class="metric-label">' + t.div + '</div><div class="metric-value">' + d.dividend_yield + '</div></div>' +
-    '<div class="metric"><div class="metric-label">' + t.high52 + ' / ' + t.low52 + '</div><div class="metric-value">$' + (d.week52_high ? d.week52_high.toFixed(2) : 'N/A') + ' / $' + (d.week52_low ? d.week52_low.toFixed(2) : 'N/A') + '</div>' + (price52pct !== null ? '<div class="week52-bar"><div class="week52-fill" style="width:'+price52pct+'%"></div></div><div class="week52-labels"><span>L</span><span style="color:#e91e8c">'+price52pct+'%</span><span>H</span></div>' : '') + '</div>' +
-    '</div>' +
-    '<div class="card-body"><div class="section"><div class="section-title">◆ ' + t.overview + '</div><div class="section-text">' + overviewText + '</div></div>' +
-    '<div class="section"><div class="section-title">◆ AI ANALYSIS</div><div id="ai-content">' + aiHTML + '</div></div></div></div>';
+  let aiSection = '<div id="ai-section">';
+  if (!ai) {
+    aiSection += '<div class="loading">' + t.analyzing + '</div>';
+  } else {
+    aiSection += '<div class="info-grid">' +
+      '<div class="info-card cyan"><div class="info-card-title">◆ ' + t.overview + '</div><div class="info-text">' + (ai.overview || '') + '</div></div>' +
+      '<div class="info-card pink"><div class="info-card-title">◆ ' + t.products + '</div><div class="tag-list">' + (ai.products || []).map(p => '<span class="tag pink">' + p + '</span>').join('') + '</div></div>' +
+      '<div class="info-card purple"><div class="info-card-title">◆ ' + t.shareholders + '</div><div class="tag-list">' + (ai.major_shareholders || []).map(s => '<span class="tag purple">' + s + '</span>').join('') + '</div></div>' +
+      '<div class="info-card green"><div class="info-card-title">◆ ' + t.partners + '</div><div class="tag-list">' + (ai.partners || []).map(p => '<span class="tag green">' + p + '</span>').join('') + '</div></div>' +
+      '<div class="info-card orange"><div class="info-card-title">◆ ' + t.competitors + '</div><div class="tag-list">' + (ai.competitors || []).map(c => '<span class="tag orange">' + c + '</span>').join('') + '</div></div>' +
+      '<div class="info-card yellow"><div class="info-card-title">◆ ' + t.news + '</div>' + (ai.recent_news || []).map(n => '<div class="news-item">' + n + '</div>').join('') + '</div>' +
+      '</div>';
+  }
+  aiSection += '</div>';
+
+  document.getElementById('result').innerHTML = topCard + metricsRow + aiSection;
 }
 </script>
 </body>

@@ -382,6 +382,63 @@ def get_company():
         return jsonify({'status': 'success', 'data': info})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+@app.route('/api/company-analysis', methods=['GET'])
+def get_company_analysis():
+    ticker = request.args.get('ticker', '').upper().strip()
+    lang = request.args.get('lang', 'en')
+    if not ticker:
+        return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
+    try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=os.getenv('CLAUDE_API_KEY'))
+        
+        if lang == 'ja':
+            prompt = f"""${ticker}について以下の情報を調べてJSON形式のみで返してください（他のテキスト不要）：
+{{
+  "company_name": "正式社名",
+  "industry": "業界",
+  "founded": "設立年",
+  "headquarters": "本社所在地",
+  "overview": "事業概要（3文）",
+  "products": ["主要製品/サービス1", "主要製品/サービス2", "主要製品/サービス3"],
+  "major_shareholders": ["大株主1", "大株主2", "大株主3"],
+  "partners": ["主要パートナー1", "主要パートナー2", "主要パートナー3"],
+  "competitors": ["競合1", "競合2", "競合3"],
+  "recent_news": ["最近の動向1", "最近の動向2"]
+}}"""
+        else:
+            prompt = f"""Research ${ticker} and respond ONLY with JSON (no other text):
+{{
+  "company_name": "full company name",
+  "industry": "industry sector",
+  "founded": "founding year",
+  "headquarters": "HQ location",
+  "overview": "3-sentence business overview",
+  "products": ["key product/service 1", "key product/service 2", "key product/service 3"],
+  "major_shareholders": ["major shareholder 1", "major shareholder 2", "major shareholder 3"],
+  "partners": ["key partner 1", "key partner 2", "key partner 3"],
+  "competitors": ["competitor 1", "competitor 2", "competitor 3"],
+  "recent_news": ["recent development 1", "recent development 2"]
+}}"""
+
+        message = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1500,
+            tools=[{"type": "web_search_20250305", "name": "web_search"}],
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        # Extract text from response
+        result_text = ''
+        for block in message.content:
+            if hasattr(block, 'text'):
+                result_text += block.text
+        
+        clean = result_text.replace('```json', '').replace('```', '').strip()
+        data = json.loads(clean)
+        return jsonify({'status': 'success', 'data': data})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/company-widget')
 def company_widget():
