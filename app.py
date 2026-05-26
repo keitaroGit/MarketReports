@@ -327,40 +327,84 @@ def get_company():
     if not ticker:
         return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
     try:
-        import yfinance as yf
-        stock = yf.Ticker(ticker)
-        info = stock.info
-        if not info or 'symbol' not in info:
+        import requests as req
+        import time
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json',
+        }
+        url = f'https://query1.finance.yahoo.com/v10/finance/quoteSummary/{ticker}'
+        params = {
+            'modules': 'summaryProfile,financialData,defaultKeyStatistics,assetProfile',
+            'corsDomain': 'finance.yahoo.com'
+        }
+        time.sleep(0.5)
+        res = req.get(url, headers=headers, params=params, timeout=15)
+        if res.status_code == 429:
+            time.sleep(2)
+            res = req.get(url, headers=headers, params=params, timeout=15)
+        if res.status_code != 200:
+            return jsonify({'status': 'error', 'message': f'Yahoo Finance error: {res.status_code}'}), 500
+
+        data = res.json()
+        result = data.get('quoteSummary', {}).get('result', [])
+        if not result:
             return jsonify({'status': 'error', 'message': 'Ticker not found'}), 404
 
-        def fmt_num(n, unit=''):
-            if n is None: return 'N/A'
-            if n >= 1e12: return f'${n/1e12:.2f}T'
-            if n >= 1e9: return f'${n/1e9:.2f}B'
-            if n >= 1e6: return f'${n/1e6:.2f}M'
-            return f'{n:,.0f}{unit}'
+        r = result[0]
+        profile = r.get('summaryProfile', {})
+        financial = r.get('financialData', {})
+        stats = r.get('defaultKeyStatistics', {})
 
-        data = {
+        def v(obj, key):
+            val = obj.get(key, {})
+            if isinstance(val, dict):
+                return val.get('raw')
+            return val
+
+        def fmt(n):
+            if n is None: return 'N/A'
+            if abs(n) >= 1e12: return f'${n/1e12:.2f}T'
+            if abs(n) >= 1e9: return f'${n/1e9:.2f}B'
+            if abs(n) >= 1e6: return f'${n/1e6:.2f}M'
+            return f'{n:,.0f}'
+
+        # Get price from separate endpoint
+        price_url = f'https://query1.finance.yahoo.com/v8/finance/chart/{ticker}'
+        price_res = req.get(price_url, headers=headers, timeout=10)
+        price = None
+        change_pct = None
+        name = ticker
+        if price_res.status_code == 200:
+            pd = price_res.json()
+            meta = pd.get('chart', {}).get('result', [{}])[0].get('meta', {})
+            price = meta.get('regularMarketPrice')
+            prev = meta.get('chartPreviousClose') or meta.get('previousClose')
+            if price and prev:
+                change_pct = (price - prev) / prev
+            name = meta.get('longName') or meta.get('shortName') or ticker
+
+        info = {
             'ticker': ticker,
-            'name': info.get('longName', ticker),
-            'sector': info.get('sector', 'N/A'),
-            'industry': info.get('industry', 'N/A'),
-            'country': info.get('country', 'N/A'),
-            'price': info.get('currentPrice') or info.get('regularMarketPrice'),
-            'change_pct': info.get('regularMarketChangePercent'),
-            'market_cap': fmt_num(info.get('marketCap')),
-            'revenue': fmt_num(info.get('totalRevenue')),
-            'net_income': fmt_num(info.get('netIncomeToCommon')),
-            'pe_ratio': round(info.get('trailingPE', 0), 1) if info.get('trailingPE') else 'N/A',
-            'eps': info.get('trailingEps'),
-            'dividend_yield': f"{info.get('dividendYield', 0)*100:.2f}%" if info.get('dividendYield') else 'N/A',
-            'week52_high': info.get('fiftyTwoWeekHigh'),
-            'week52_low': info.get('fiftyTwoWeekLow'),
-            'employees': f"{info.get('fullTimeEmployees', 0):,}" if info.get('fullTimeEmployees') else 'N/A',
-            'description': info.get('longBusinessSummary', ''),
-            'website': info.get('website', ''),
+            'name': name,
+            'sector': profile.get('sector', 'N/A'),
+            'industry': profile.get('industry', 'N/A'),
+            'country': profile.get('country', 'N/A'),
+            'employees': f"{profile.get('fullTimeEmployees', 0):,}" if profile.get('fullTimeEmployees') else 'N/A',
+            'price': price,
+            'change_pct': change_pct,
+            'market_cap': fmt(v(stats, 'marketCap')),
+            'revenue': fmt(v(financial, 'totalRevenue')),
+            'net_income': fmt(v(financial, 'netIncomeToCommon') or v(stats, 'netIncomeToCommon')),
+            'pe_ratio': round(v(stats, 'trailingPE'), 1) if v(stats, 'trailingPE') else 'N/A',
+            'eps': v(stats, 'trailingEps'),
+            'dividend_yield': f"{v(stats,'dividendYield')*100:.2f}%" if v(stats,'dividendYield') else 'N/A',
+            'week52_high': v(stats, 'fiftyTwoWeekHigh'),
+            'week52_low': v(stats, 'fiftyTwoWeekLow'),
+            'description': profile.get('longBusinessSummary', ''),
+            'website': profile.get('website', ''),
         }
-        return jsonify({'status': 'success', 'data': data})
+        return jsonify({'status': 'success', 'data': info})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
