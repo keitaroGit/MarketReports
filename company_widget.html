@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Card</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: #0a0e17; color: #e0e8f0; padding: 16px; min-height: 100vh; }
+  .header { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #4a9eff; letter-spacing: 0.08em; text-transform: uppercase; }
+  .controls { display: flex; align-items: center; gap: 8px; }
+  .lang-btn { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 2px; border: 1px solid #1e2a3a; background: transparent; color: #6b7f96; cursor: pointer; }
+  .lang-btn.active { background: #4a9eff; color: #fff; border-color: #4a9eff; }
+  .search-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+  .search-input { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; background: #0f1724; border: 1px solid #1e2a3a; border-radius: 4px; padding: 10px 14px; color: #e0e8f0; text-transform: uppercase; letter-spacing: 0.1em; outline: none; transition: border-color 0.15s; }
+  .search-input:focus { border-color: #4a9eff; }
+  .search-input::placeholder { color: #2a3a50; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .search-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; background: #4a9eff; color: #fff; border: none; border-radius: 4px; padding: 10px 18px; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  .search-btn:hover { background: #3a8eef; }
+  .search-btn:disabled { background: #1e2a3a; color: #4a5a6e; cursor: not-allowed; }
+
+  .card { background: #0f1724; border: 1px solid #1e2a3a; border-radius: 6px; overflow: hidden; }
+  .card-header { padding: 20px; border-bottom: 1px solid #1e2a3a; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+  .company-name { font-size: 20px; font-weight: 600; color: #e0e8f0; margin-bottom: 4px; }
+  .company-meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #4a5a6e; }
+  .price-block { text-align: right; }
+  .price { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; color: #e0e8f0; }
+  .price-change { font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 2px; }
+  .price-change.up { color: #22c55e; }
+  .price-change.down { color: #f87171; }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: #1e2a3a; border-top: 1px solid #1e2a3a; }
+  .metric { background: #0f1724; padding: 12px 16px; }
+  .metric-label { font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 0.08em; color: #3a4a5e; margin-bottom: 4px; }
+  .metric-value { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #c0ccd8; }
+
+  .card-body { padding: 20px; }
+  .section { margin-bottom: 20px; }
+  .section:last-child { margin-bottom: 0; }
+  .section-title { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #4a5a6e; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #1a2535; }
+  .section-text { font-size: 12px; color: #7a8a9a; line-height: 1.75; }
+
+  .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ai-box { background: #0a0e17; border: 1px solid #1a2535; border-radius: 4px; padding: 12px; }
+  .ai-box.strengths { border-left: 3px solid #22c55e; }
+  .ai-box.risks { border-left: 3px solid #f87171; }
+  .ai-box-title { font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .ai-box.strengths .ai-box-title { color: #22c55e; }
+  .ai-box.risks .ai-box-title { color: #f87171; }
+  .ai-box ul { list-style: none; padding: 0; }
+  .ai-box ul li { font-size: 11px; color: #7a8a9a; line-height: 1.6; padding: 3px 0; border-bottom: 1px solid #1a2535; }
+  .ai-box ul li:last-child { border-bottom: none; }
+  .ai-box ul li::before { content: '▸ '; color: #3a4a5e; }
+
+  .loading-ai { text-align: center; padding: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #2a3a50; letter-spacing: 0.1em; }
+  .ticker-badge { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; background: #1a2535; border: 1px solid #2a3a50; border-radius: 2px; padding: 2px 8px; color: #4a9eff; margin-right: 8px; }
+  .error-msg { text-align: center; padding: 30px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #f87171; }
+  .placeholder { text-align: center; padding: 40px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #2a3a50; line-height: 2; }
+  .week52-bar { margin-top: 6px; height: 4px; background: #1a2535; border-radius: 2px; position: relative; overflow: hidden; }
+  .week52-fill { height: 100%; background: linear-gradient(90deg, #1a4a6b, #4a9eff); border-radius: 2px; }
+  .week52-labels { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #3a4a5e; margin-top: 3px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="title" id="title-text">COMPANY SNAPSHOT</div>
+  <div class="controls">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-ja" onclick="setLang('ja')">JA</button>
+  </div>
+</div>
+
+<div class="search-bar">
+  <input class="search-input" id="ticker-input" type="text" placeholder="Enter ticker symbol (e.g. NVDA, AAPL, TSLA)" maxlength="10" />
+  <button class="search-btn" id="search-btn" onclick="search()">SEARCH</button>
+</div>
+
+<div id="result">
+  <div class="placeholder">
+    ENTER A TICKER SYMBOL ABOVE<br>
+    <span style="color:#1e2a3a">─────────────────</span><br>
+    NVDA &nbsp;·&nbsp; AAPL &nbsp;·&nbsp; TSLA &nbsp;·&nbsp; MSFT &nbsp;·&nbsp; AMZN
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://marketreports-production.up.railway.app';
+let lang = 'en';
+let currentData = null;
+let currentAI = null;
+
+const L = {
+  en: { title:'COMPANY SNAPSHOT', overview:'Business Overview', strengths:'Key Strengths', risks:'Key Risks', employees:'Employees', sector:'Sector', industry:'Industry', country:'Country', mktcap:'Mkt Cap', revenue:'Revenue', netincome:'Net Income', pe:'P/E Ratio', eps:'EPS', div:'Div Yield', high52:'52W High', low52:'52W Low', price:'Price', searching:'SEARCHING...', analyzing:'ANALYZING WITH AI...' },
+  ja: { title:'企業スナップショット', overview:'ビジネス概要', strengths:'主な強み', risks:'主なリスク', employees:'従業員数', sector:'セクター', industry:'業種', country:'国', mktcap:'時価総額', revenue:'売上高', netincome:'純利益', pe:'PER', eps:'EPS', div:'配当利回り', high52:'52週高値', low52:'52週安値', price:'株価', searching:'検索中...', analyzing:'AI分析中...' }
+};
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-en').className = 'lang-btn' + (l==='en'?' active':'');
+  document.getElementById('btn-ja').className = 'lang-btn' + (l==='ja'?' active':'');
+  document.getElementById('title-text').textContent = L[l].title;
+  if (currentData) renderCard(currentData, currentAI);
+}
+
+document.getElementById('ticker-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') search();
+});
+
+async function search() {
+  const ticker = document.getElementById('ticker-input').value.trim().toUpperCase();
+  if (!ticker) return;
+  const btn = document.getElementById('search-btn');
+  btn.disabled = true;
+  btn.textContent = L[lang].searching;
+  document.getElementById('result').innerHTML = '<div class="loading-ai">' + L[lang].searching + '</div>';
+  try {
+    const res = await fetch(API_BASE + '/api/company?ticker=' + ticker);
+    const json = await res.json();
+    if (json.status !== 'success') throw new Error(json.message || 'Not found');
+    currentData = json.data;
+    currentAI = null;
+    renderCard(currentData, null);
+    fetchAI(ticker);
+  } catch(e) {
+    document.getElementById('result').innerHTML = '<div class="error-msg">❌ ' + e.message + '</div>';
+  }
+  btn.disabled = false;
+  btn.textContent = 'SEARCH';
+}
+
+async function fetchAI(ticker) {
+  const aiSection = document.getElementById('ai-section');
+  if (aiSection) aiSection.innerHTML = '<div class="loading-ai">' + L[lang].analyzing + '</div>';
+  try {
+    const prompt = lang === 'ja'
+      ? `${ticker}について以下をJSON形式で返してください（他のテキスト不要）：{"overview":"3文で事業概要","strengths":["強み1","強み2","強み3"],"risks":["リスク1","リスク2","リスク3"]}`
+      : `For ${ticker}, respond ONLY with JSON (no other text): {"overview":"3-sentence business overview","strengths":["strength1","strength2","strength3"],"risks":["risk1","risk2","risk3"]}`;
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = data.content[0].text;
+    const clean = text.replace(/```json|```/g, '').trim();
+    currentAI = JSON.parse(clean);
+    renderCard(currentData, currentAI);
+  } catch(e) {
+    if (aiSection) aiSection.innerHTML = '<div class="loading-ai" style="color:#f87171">AI analysis unavailable</div>';
+  }
+}
+
+function renderCard(d, ai) {
+  const t = L[lang];
+  const changePct = d.change_pct ? (d.change_pct * 100).toFixed(2) : null;
+  const changeClass = changePct >= 0 ? 'up' : 'down';
+  const changeSign = changePct >= 0 ? '+' : '';
+
+  const price52pct = d.week52_high && d.week52_low && d.price
+    ? Math.round(((d.price - d.week52_low) / (d.week52_high - d.week52_low)) * 100)
+    : null;
+
+  const aiHTML = ai
+    ? `<div class="ai-grid">
+        <div class="ai-box strengths">
+          <div class="ai-box-title">${t.strengths}</div>
+          <ul>${ai.strengths.map(s=>'<li>'+s+'</li>').join('')}</ul>
+        </div>
+        <div class="ai-box risks">
+          <div class="ai-box-title">${t.risks}</div>
+          <ul>${ai.risks.map(r=>'<li>'+r+'</li>').join('')}</ul>
+        </div>
+      </div>`
+    : `<div class="loading-ai" id="ai-section">${t.analyzing}</div>`;
+
+  const overviewText = ai ? ai.overview : (d.description ? d.description.substring(0, 300) + '...' : 'N/A');
+
+  document.getElementById('result').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="company-name"><span class="ticker-badge">${d.ticker}</span>${d.name}</div>
+          <div class="company-meta">${d.sector} · ${d.industry} · ${d.country} · ${t.employees}: ${d.employees}</div>
+        </div>
+        <div class="price-block">
+          <div class="price">$${d.price ? d.price.toFixed(2) : 'N/A'}</div>
+          ${changePct !== null ? `<div class="price-change ${changeClass}">${changeSign}${changePct}%</div>` : ''}
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric"><div class="metric-label">${t.mktcap}</div><div class="metric-value">${d.market_cap}</div></div>
+        <div class="metric"><div class="metric-label">${t.revenue}</div><div class="metric-value">${d.revenue}</div></div>
+        <div class="metric"><div class="metric-label">${t.netincome}</div><div class="metric-value">${d.net_income}</div></div>
+        <div class="metric"><div class="metric-label">${t.pe}</div><div class="metric-value">${d.pe_ratio}</div></div>
+        <div class="metric"><div class="metric-label">${t.eps}</div><div class="metric-value">${d.eps ? '$'+d.eps.toFixed(2) : 'N/A'}</div></div>
+        <div class="metric"><div class="metric-label">${t.div}</div><div class="metric-value">${d.dividend_yield}</div></div>
+        <div class="metric">
+          <div class="metric-label">${t.high52} / ${t.low52}</div>
+          <div class="metric-value">$${d.week52_high ? d.week52_high.toFixed(2) : 'N/A'} / $${d.week52_low ? d.week52_low.toFixed(2) : 'N/A'}</div>
+          ${price52pct !== null ? `<div class="week52-bar"><div class="week52-fill" style="width:${price52pct}%"></div></div><div class="week52-labels"><span>${t.low52}</span><span style="color:#4a9eff">${price52pct}%</span><span>${t.high52}</span></div>` : ''}
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="section">
+          <div class="section-title">${t.overview}</div>
+          <div class="section-text">${overviewText}</div>
+        </div>
+        <div class="section" id="ai-section">
+          ${aiHTML}
+        </div>
+      </div>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

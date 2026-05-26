@@ -321,6 +321,52 @@ def get_calendar():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/api/company', methods=['GET'])
+def get_company():
+    ticker = request.args.get('ticker', '').upper().strip()
+    if not ticker:
+        return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
+    try:
+        import yfinance as yf
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        if not info or 'symbol' not in info:
+            return jsonify({'status': 'error', 'message': 'Ticker not found'}), 404
+
+        def fmt_num(n, unit=''):
+            if n is None: return 'N/A'
+            if n >= 1e12: return f'${n/1e12:.2f}T'
+            if n >= 1e9: return f'${n/1e9:.2f}B'
+            if n >= 1e6: return f'${n/1e6:.2f}M'
+            return f'{n:,.0f}{unit}'
+
+        data = {
+            'ticker': ticker,
+            'name': info.get('longName', ticker),
+            'sector': info.get('sector', 'N/A'),
+            'industry': info.get('industry', 'N/A'),
+            'country': info.get('country', 'N/A'),
+            'price': info.get('currentPrice') or info.get('regularMarketPrice'),
+            'change_pct': info.get('regularMarketChangePercent'),
+            'market_cap': fmt_num(info.get('marketCap')),
+            'revenue': fmt_num(info.get('totalRevenue')),
+            'net_income': fmt_num(info.get('netIncomeToCommon')),
+            'pe_ratio': round(info.get('trailingPE', 0), 1) if info.get('trailingPE') else 'N/A',
+            'eps': info.get('trailingEps'),
+            'dividend_yield': f"{info.get('dividendYield', 0)*100:.2f}%" if info.get('dividendYield') else 'N/A',
+            'week52_high': info.get('fiftyTwoWeekHigh'),
+            'week52_low': info.get('fiftyTwoWeekLow'),
+            'employees': f"{info.get('fullTimeEmployees', 0):,}" if info.get('fullTimeEmployees') else 'N/A',
+            'description': info.get('longBusinessSummary', ''),
+            'website': info.get('website', ''),
+        }
+        return jsonify({'status': 'success', 'data': data})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/company-widget')
+def company_widget():
+    return send_from_directory('.', 'company_widget.html')
 @app.route('/calendar-widget')
 def calendar_widget():
     return send_from_directory('.', 'calendar_widget.html')    
