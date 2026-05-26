@@ -350,8 +350,12 @@ def get_company():
                 return f'{n:,.0f}'
             except: return 'N/A'
 
-        price = float(q.get('05. price', 0)) or None
-        prev = float(q.get('08. previous close', 0)) or None
+        try:
+            price = float(q.get('05. price', 0)) if q.get('05. price') else None
+            prev = float(q.get('08. previous close', 0)) if q.get('08. previous close') else None
+        except:
+            price = None
+            prev = None
         change_pct = ((price - prev) / prev) if price and prev else None
 
         info = {
