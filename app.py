@@ -328,42 +328,23 @@ def get_company():
         return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
     try:
         import requests as req
-        import time
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': '*/*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Referer': 'https://finance.yahoo.com',
-            'Origin': 'https://finance.yahoo.com',
-        }
-        url = f'https://query2.finance.yahoo.com/v10/finance/quoteSummary/{ticker}'
-        params = {
-            'modules': 'summaryProfile,financialData,defaultKeyStatistics,assetProfile',
-            'corsDomain': 'finance.yahoo.com'
-        }
-        time.sleep(0.5)
-        res = req.get(url, headers=headers, params=params, timeout=15)
-        if res.status_code == 429:
-            time.sleep(2)
-            res = req.get(url, headers=headers, params=params, timeout=15)
-        if res.status_code != 200:
-            return jsonify({'status': 'error', 'message': f'Yahoo Finance error: {res.status_code}'}), 500
+        api_key = os.getenv('FINNHUB_API_KEY')
+        headers = {'X-Finnhub-Token': api_key}
 
-        data = res.json()
-        result = data.get('quoteSummary', {}).get('result', [])
-        if not result:
+        # Quote (price)
+        quote_res = req.get(f'https://finnhub.io/api/v1/quote?symbol={ticker}', headers=headers, timeout=10)
+        quote = quote_res.json() if quote_res.status_code == 200 else {}
+
+        # Company profile
+        profile_res = req.get(f'https://finnhub.io/api/v1/stock/profile2?symbol={ticker}', headers=headers, timeout=10)
+        profile = profile_res.json() if profile_res.status_code == 200 else {}
+
+        # Basic financials
+        fin_res = req.get(f'https://finnhub.io/api/v1/stock/metric?symbol={ticker}&metric=all', headers=headers, timeout=10)
+        fin = fin_res.json().get('metric', {}) if fin_res.status_code == 200 else {}
+
+        if not profile or not profile.get('name'):
             return jsonify({'status': 'error', 'message': 'Ticker not found'}), 404
-
-        r = result[0]
-        profile = r.get('summaryProfile', {})
-        financial = r.get('financialData', {})
-        stats = r.get('defaultKeyStatistics', {})
-
-        def v(obj, key):
-            val = obj.get(key, {})
-            if isinstance(val, dict):
-                return val.get('raw')
-            return val
 
         def fmt(n):
             if n is None: return 'N/A'
@@ -372,40 +353,32 @@ def get_company():
             if abs(n) >= 1e6: return f'${n/1e6:.2f}M'
             return f'{n:,.0f}'
 
-        # Get price from separate endpoint
-        price_url = f'https://query1.finance.yahoo.com/v8/finance/chart/{ticker}'
-        price_res = req.get(price_url, headers=headers, timeout=10)
-        price = None
-        change_pct = None
-        name = ticker
-        if price_res.status_code == 200:
-            pd = price_res.json()
-            meta = pd.get('chart', {}).get('result', [{}])[0].get('meta', {})
-            price = meta.get('regularMarketPrice')
-            prev = meta.get('chartPreviousClose') or meta.get('previousClose')
-            if price and prev:
-                change_pct = (price - prev) / prev
-            name = meta.get('longName') or meta.get('shortName') or ticker
+        price = quote.get('c')
+        prev = quote.get('pc')
+        change_pct = ((price - prev) / prev) if price and prev else None
+
+        mktcap = profile.get('marketCapitalization')
+        mktcap_fmt = fmt(mktcap * 1e6) if mktcap else 'N/A'
 
         info = {
             'ticker': ticker,
-            'name': name,
-            'sector': profile.get('sector', 'N/A'),
-            'industry': profile.get('industry', 'N/A'),
+            'name': profile.get('name', ticker),
+            'sector': profile.get('finnhubIndustry', 'N/A'),
+            'industry': profile.get('finnhubIndustry', 'N/A'),
             'country': profile.get('country', 'N/A'),
-            'employees': f"{profile.get('fullTimeEmployees', 0):,}" if profile.get('fullTimeEmployees') else 'N/A',
+            'employees': f"{profile.get('employeeTotal', 0):,}" if profile.get('employeeTotal') else 'N/A',
             'price': price,
             'change_pct': change_pct,
-            'market_cap': fmt(v(stats, 'marketCap')),
-            'revenue': fmt(v(financial, 'totalRevenue')),
-            'net_income': fmt(v(financial, 'netIncomeToCommon') or v(stats, 'netIncomeToCommon')),
-            'pe_ratio': round(v(stats, 'trailingPE'), 1) if v(stats, 'trailingPE') else 'N/A',
-            'eps': v(stats, 'trailingEps'),
-            'dividend_yield': f"{v(stats,'dividendYield')*100:.2f}%" if v(stats,'dividendYield') else 'N/A',
-            'week52_high': v(stats, 'fiftyTwoWeekHigh'),
-            'week52_low': v(stats, 'fiftyTwoWeekLow'),
-            'description': profile.get('longBusinessSummary', ''),
-            'website': profile.get('website', ''),
+            'market_cap': mktcap_fmt,
+            'revenue': fmt(fin.get('revenuePerShareTTM') and fin.get('revenuePerShareTTM') * fin.get('shareOutstanding', 0) * 1e6),
+            'net_income': 'N/A',
+            'pe_ratio': round(fin.get('peTTM'), 1) if fin.get('peTTM') else 'N/A',
+            'eps': round(fin.get('epsTTM'), 2) if fin.get('epsTTM') else 'N/A',
+            'dividend_yield': f"{fin.get('dividendYieldIndicatedAnnual', 0):.2f}%" if fin.get('dividendYieldIndicatedAnnual') else 'N/A',
+            'week52_high': fin.get('52WeekHigh'),
+            'week52_low': fin.get('52WeekLow'),
+            'description': f"{profile.get('name')} is listed on {profile.get('exchange')} under ticker {ticker}. Industry: {profile.get('finnhubIndustry')}. IPO: {profile.get('ipo')}. Website: {profile.get('weburl')}",
+            'website': profile.get('weburl', ''),
         }
         return jsonify({'status': 'success', 'data': info})
     except Exception as e:
