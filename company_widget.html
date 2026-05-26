@@ -195,7 +195,7 @@ function renderCard(d, ai) {
         <div class="metric"><div class="metric-label">${t.revenue}</div><div class="metric-value">${d.revenue}</div></div>
         <div class="metric"><div class="metric-label">${t.netincome}</div><div class="metric-value">${d.net_income}</div></div>
         <div class="metric"><div class="metric-label">${t.pe}</div><div class="metric-value">${d.pe_ratio}</div></div>
-        <div class="metric"><div class="metric-label">${t.eps}</div><div class="metric-value">${d.eps ? '$'+d.eps.toFixed(2) : 'N/A'}</div></div>
+        <div class="metric"><div class="metric-label">${t.eps}</div><div class="metric-value">${d.eps ? '$'+parseFloat(d.eps).toFixed(2) : 'N/A'}</div></div>
         <div class="metric"><div class="metric-label">${t.div}</div><div class="metric-value">${d.dividend_yield}</div></div>
         <div class="metric">
           <div class="metric-label">${t.high52} / ${t.low52}</div>
