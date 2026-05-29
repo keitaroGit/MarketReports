@@ -6,8 +6,9 @@ from flask import Flask, render_template, jsonify, request, Response, send_from_
 from flask_cors import CORS
 import os 
 import json
+import time
 from dotenv import load_dotenv
-load_dotenv(override=False)  # 既存の環境変数を上書きしない
+load_dotenv(override=False)
 from config import config
 from services.fred_service import FREDService
 from services.newsapi_service import NewsAPIService
@@ -41,33 +42,40 @@ dashboard_data = {
 }
 
 # ============================================================================
+# In-memory cache for company data
+# ============================================================================
+company_cache = {}
+COMPANY_CACHE_TTL = 900  # 15 minutes
+
+def get_company_cached(key):
+    if key in company_cache:
+        data, timestamp = company_cache[key]
+        if time.time() - timestamp < COMPANY_CACHE_TTL:
+            return data
+    return None
+
+def set_company_cached(key, data):
+    company_cache[key] = (data, time.time())
+
+# ============================================================================
 # Data Update Functions
 # ============================================================================
 
 def update_macro_overview():
-    """Fetch and update macro overview data"""
     try:
-        # Try to get from cache first
         cache_key = 'macro_overview'
         cached_data = cache_manager.get(cache_key, ttl_seconds=app.config['CACHE_TTL'])
-        
         if cached_data:
             dashboard_data['macro_overview'] = cached_data
             return
-        
-        # Fetch fresh data from FRED
         macro_data = fred_service.get_macroeconomic_data()
-        
-        # Generate AI commentary
         commentary = claude_service.generate_macro_commentary(macro_data, language='en')
         commentary_ja = claude_service.generate_macro_commentary(macro_data, language='ja')
-        
         macro_overview = {
             'data': macro_data,
             'commentary': commentary,
             'commentary_ja': commentary_ja
         }
-        
         cache_manager.set(cache_key, macro_overview)
         dashboard_data['macro_overview'] = macro_overview
     except Exception as e:
@@ -75,29 +83,20 @@ def update_macro_overview():
         dashboard_data['macro_overview'] = {'error': str(e)}
 
 def update_geopolitical_radar():
-    """Fetch and update geopolitical news"""
     try:
-        # Try to get from cache first
         cache_key = 'geopolitical_radar'
         cached_data = cache_manager.get(cache_key, ttl_seconds=app.config['CACHE_TTL'])
-        
         if cached_data:
             dashboard_data['geopolitical_radar'] = cached_data
             return
-        
-        # Fetch news
         news_items = newsapi_service.get_geopolitical_news(limit=10)
-        
-        # Generate AI summary
         summary = claude_service.generate_geopolitical_summary(news_items, language='en')
         summary_ja = claude_service.generate_geopolitical_summary(news_items, language='ja')
-        
         geopolitical_radar = {
             'news': news_items,
             'summary': summary,
             'summary_ja': summary_ja
         }
-        
         cache_manager.set(cache_key, geopolitical_radar)
         dashboard_data['geopolitical_radar'] = geopolitical_radar
     except Exception as e:
@@ -105,17 +104,12 @@ def update_geopolitical_radar():
         dashboard_data['geopolitical_radar'] = {'error': str(e)}
 
 def update_sector_scorecard():
-    """Fetch and update sector performance data"""
     try:
-        # Try to get from cache first
         cache_key = 'sector_scorecard'
         cached_data = cache_manager.get(cache_key, ttl_seconds=app.config['CACHE_TTL'])
-        
         if cached_data:
             dashboard_data['sector_scorecard'] = cached_data
             return
-        
-        # Fetch sector data
         try:
             sector_data = yahoo_service.get_sector_performance()
             if not sector_data:
@@ -123,11 +117,7 @@ def update_sector_scorecard():
         except Exception as e:
             print(f"Yahoo Finance error: {e}")
             sector_data = yahoo_service._get_fallback_data()
-        
-        sector_scorecard = {
-            'sectors': sector_data
-        }
-        
+        sector_scorecard = {'sectors': sector_data}
         cache_manager.set(cache_key, sector_scorecard)
         dashboard_data['sector_scorecard'] = sector_scorecard
     except Exception as e:
@@ -140,85 +130,62 @@ def update_sector_scorecard():
 
 @app.route('/')
 def index():
-    """Render main dashboard"""
     return render_template('index.html', language=dashboard_data['language'])
 
 @app.route('/api/dashboard', methods=['GET'])
 def get_dashboard():
-    """Get all dashboard data"""
     language = request.args.get('language', 'en')
-    
     response = {}
-    
-    # Macro Overview
     if dashboard_data['macro_overview']:
         macro = dashboard_data['macro_overview'].copy()
         if 'commentary' in macro:
             if language == 'ja':
                 macro['commentary'] = macro.get('commentary_ja', macro['commentary'])
             response['macro_overview'] = macro
-    
-    # Geopolitical Radar
     if dashboard_data['geopolitical_radar']:
         geo = dashboard_data['geopolitical_radar'].copy()
         if 'summary' in geo:
             if language == 'ja':
                 geo['summary'] = geo.get('summary_ja', geo['summary'])
             response['geopolitical_radar'] = geo
-    
-    # Sector Scorecard
     if dashboard_data['sector_scorecard']:
         response['sector_scorecard'] = dashboard_data['sector_scorecard'].copy()
-    
     return jsonify(response)
 
 @app.route('/api/macro-overview', methods=['GET'])
 def get_macro_overview():
-    """Get macro overview data"""
     language = request.args.get('language', 'en')
-    
     if dashboard_data['macro_overview']:
         data = dashboard_data['macro_overview'].copy()
         if language == 'ja':
             data['commentary'] = data.get('commentary_ja', data.get('commentary', ''))
         return jsonify(data)
-    
     return jsonify({'error': 'No data available'})
 
 @app.route('/api/geopolitical-radar', methods=['GET'])
 def get_geopolitical_radar():
-    """Get geopolitical radar data"""
     language = request.args.get('language', 'en')
-    
     if dashboard_data['geopolitical_radar']:
         data = dashboard_data['geopolitical_radar'].copy()
         if language == 'ja':
             data['summary'] = data.get('summary_ja', data.get('summary', ''))
         return jsonify(data)
-    
     return jsonify({'error': 'No data available'})
 
 @app.route('/api/sector-scorecard', methods=['GET'])
 def get_sector_scorecard():
-    """Get sector scorecard data"""
     language = request.args.get('language', 'en')
-    
     if dashboard_data['sector_scorecard']:
         data = dashboard_data['sector_scorecard'].copy()
-        
-        # Add localized sector names if requested
         if language == 'ja' and 'sectors' in data:
             for sector in data['sectors']:
                 if 'ja_name' in sector:
                     sector['display_name'] = sector['ja_name']
-        
         return jsonify(data)
-    
     return jsonify({'error': 'No data available'})
 
 @app.route('/api/refresh', methods=['POST'])
 def refresh_data():
-    """Manually refresh all data"""
     try:
         update_macro_overview()
         update_geopolitical_radar()
@@ -229,7 +196,6 @@ def refresh_data():
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    import os
     claude_key = os.getenv('CLAUDE_API_KEY', 'NOT_FOUND')
     return jsonify({
         'status': 'healthy',
@@ -239,70 +205,48 @@ def health_check():
         'has_geo': dashboard_data['geopolitical_radar'] is not None,
         'has_sectors': dashboard_data['sector_scorecard'] is not None,
     })
-# ============================================================================
-# Initialization and Error Handling
-# ============================================================================
+
 @app.route('/api/news', methods=['GET'])
 def get_news():
-    """Get latest news for external use (Wix etc.)"""
     try:
         limit = int(request.args.get('limit', 10))
         news_items = newsapi_service.get_geopolitical_news(limit=limit)
-        return jsonify({
-            'status': 'success',
-            'news': news_items
-        })
+        return jsonify({'status': 'success', 'news': news_items})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/api/weekly-report', methods=['GET'])
 def get_weekly_report():
-    """Generate weekly market report"""
     language = request.args.get('language', 'en')
-    
     try:
         macro = dashboard_data.get('macro_overview', {})
         geo = dashboard_data.get('geopolitical_radar', {})
         sector = dashboard_data.get('sector_scorecard', {})
-        
         if not macro or not geo or not sector:
             return jsonify({'status': 'error', 'message': 'Data not ready yet'}), 503
-        
         macro_data = macro.get('data', {})
         report = report_service.generate_weekly_report(
-            macro_data=macro_data,
-            geo_data=geo,
-            sector_data=sector,
-            language=language
+            macro_data=macro_data, geo_data=geo, sector_data=sector, language=language
         )
         metadata = report_service.get_report_metadata()
-        
         return Response(
-            json.dumps({
-                'status': 'success',
-                'report': report,
-                'metadata': metadata
-            }, ensure_ascii=False),
+            json.dumps({'status': 'success', 'report': report, 'metadata': metadata}, ensure_ascii=False),
             mimetype='application/json'
         )
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500   
-    
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/api/fedwatch', methods=['GET'])
 def get_fedwatch():
-    """Get Fed rate probability data from FF futures"""
     try:
         from services.fedwatch_service import FedWatchService
         fedwatch = FedWatchService()
-        current_rate = 4.33  # Current FF rate
-        
-        # Check macro data for current rate
+        current_rate = 4.33
         if dashboard_data['macro_overview']:
             macro = dashboard_data['macro_overview'].get('data', {})
             if macro.get('FF_RATE'):
                 current_rate = macro['FF_RATE']
-        
         result = fedwatch.calculate_probabilities(current_rate)
-
         return jsonify({
             'status': 'success',
             'current_rate': current_rate,
@@ -311,6 +255,7 @@ def get_fedwatch():
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/api/calendar')
 def get_calendar():
     try:
@@ -327,16 +272,28 @@ def get_company():
     if not ticker:
         return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
     try:
+        # Check cache first
+        cached = get_company_cached(f'fin_{ticker}')
+        if cached:
+            return jsonify({'status': 'success', 'data': cached, 'cached': True})
+
         import requests as req
         api_key = os.getenv('ALPHAVANTAGE_API_KEY', 'O4JKJ5C6QPRE5JVG')
 
         # Company overview
-        ov_res = req.get(f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={api_key}', timeout=15)
+        ov_res = req.get(
+            f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={api_key}',
+            timeout=15
+        )
         ov = ov_res.json() if ov_res.status_code == 200 else {}
-        import time
-        time.sleep(1)
+
+        time.sleep(0.5)  # 短縮：1秒→0.5秒
+
         # Global quote (price)
-        q_res = req.get(f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={api_key}', timeout=15)
+        q_res = req.get(
+            f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={api_key}',
+            timeout=15
+        )
         q = q_res.json().get('Global Quote', {}) if q_res.status_code == 200 else {}
 
         if not ov or not ov.get('Name'):
@@ -377,11 +334,15 @@ def get_company():
             'week52_high': float(ov.get('52WeekHigh', 0)) or None,
             'week52_low': float(ov.get('52WeekLow', 0)) or None,
             'description': ov.get('Description', ''),
-            'website': '',
+            'website': ov.get('OfficialSite', ''),
         }
+
+        # Save to cache
+        set_company_cached(f'fin_{ticker}', info)
         return jsonify({'status': 'success', 'data': info})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/api/company-analysis', methods=['GET'])
 def get_company_analysis():
     ticker = request.args.get('ticker', '').upper().strip()
@@ -389,27 +350,32 @@ def get_company_analysis():
     if not ticker:
         return jsonify({'status': 'error', 'message': 'Ticker required'}), 400
     try:
+        # Check cache first
+        cached = get_company_cached(f'analysis_{ticker}_{lang}')
+        if cached:
+            return jsonify({'status': 'success', 'data': cached, 'cached': True})
+
         import anthropic
         client = anthropic.Anthropic(api_key=os.getenv('CLAUDE_API_KEY'))
-        
+
         if lang == 'ja':
-            prompt = f"""${ticker}について以下の情報を調べてJSON形式のみで返してください（他のテキスト不要）：
+            prompt = f"""{ticker}について以下の情報を調べてJSON形式のみで返してください（前置き・説明・マークダウン不要）：
 {{
   "company_name": "正式社名（英語）",
   "industry": "業界（英語）",
   "founded": "設立年",
   "headquarters": "本社所在地（英語）",
   "origin_country": "発祥国（日本語）",
-  "overview": "事業概要を日本語3文で",
+  "overview": "事業概要を日本語3文で記述",
   "products": ["主要製品/サービス1（英語名）", "主要製品/サービス2（英語名）", "主要製品/サービス3（英語名）"],
   "major_customers": ["主要顧客1（英語名）", "主要顧客2（英語名）", "主要顧客3（英語名）"],
   "major_shareholders": ["大株主1（英語名）", "大株主2（英語名）", "大株主3（英語名）"],
   "partners": ["主要パートナー1（英語名）", "主要パートナー2（英語名）", "主要パートナー3（英語名）"],
   "competitors": ["競合1（英語名）", "競合2（英語名）", "競合3（英語名）"],
-  "recent_news": ["最近の動向1を日本語で", "最近の動向2を日本語で"]
+  "recent_news": ["最近の動向1（日本語で記述）", "最近の動向2（日本語で記述）"]
 }}"""
         else:
-            prompt = f"""Research ${ticker} and respond ONLY with JSON (no other text):
+            prompt = f"""Research {ticker} and respond ONLY with JSON (no preamble, no markdown):
 {{
   "company_name": "full company name",
   "industry": "industry sector",
@@ -431,15 +397,17 @@ def get_company_analysis():
             tools=[{"type": "web_search_20250305", "name": "web_search"}],
             messages=[{"role": "user", "content": prompt}]
         )
-        
-        # Extract text from response
+
         result_text = ''
         for block in message.content:
             if hasattr(block, 'text'):
                 result_text += block.text
-        
+
         clean = result_text.replace('```json', '').replace('```', '').strip()
         data = json.loads(clean)
+
+        # Save to cache
+        set_company_cached(f'analysis_{ticker}_{lang}', data)
         return jsonify({'status': 'success', 'data': data})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
@@ -447,12 +415,15 @@ def get_company_analysis():
 @app.route('/company-widget')
 def company_widget():
     return send_from_directory('.', 'company_widget.html')
+
 @app.route('/calendar-widget')
 def calendar_widget():
-    return send_from_directory('.', 'calendar_widget.html')    
+    return send_from_directory('.', 'calendar_widget.html')
+
 @app.route('/fedwatch-widget')
 def fedwatch_widget():
     return send_from_directory('.', 'fedwatch_widget.html')
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Not found'}), 404
@@ -462,13 +433,12 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 def initialize_dashboard():
-    """Initialize all dashboard data on startup"""
     print("Initializing dashboard data...")
     update_macro_overview()
     update_geopolitical_radar()
     update_sector_scorecard()
     print("Dashboard initialized")
-# Initialize for gunicorn
+
 initialize_dashboard()
 scheduler.start()
 update_interval = app.config.get('UPDATE_INTERVAL', 30)
@@ -477,20 +447,12 @@ scheduler.add_job(update_geopolitical_radar, interval_minutes=update_interval, j
 scheduler.add_job(update_sector_scorecard, interval_minutes=update_interval, job_id='sector_update')
 
 if __name__ == '__main__':
-
-    # Initialize data
     initialize_dashboard()
-    
-    # Start scheduler
     scheduler.start()
-    
-    # Schedule periodic updates (every 30 minutes by default)
     update_interval = app.config.get('UPDATE_INTERVAL', 30)
     scheduler.add_job(update_macro_overview, interval_minutes=update_interval, job_id='macro_update')
     scheduler.add_job(update_geopolitical_radar, interval_minutes=update_interval, job_id='geo_update')
     scheduler.add_job(update_sector_scorecard, interval_minutes=update_interval, job_id='sector_update')
-    
-    # Run Flask app
     try:
         app.run(
             host=app.config['HOST'],
